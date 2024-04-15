@@ -3,11 +3,14 @@ from flask import Flask, request, jsonify
 import threading
 import time
 import tkinter as tk
+import json
 
 
 app = Flask(__name__)
 
 time_zero = 0
+
+webhook_port = 5001
 
 state = {"balls" : 
             {"29" : 0, 
@@ -174,7 +177,18 @@ def gui_loop():
     window.root.mainloop()
 
 
+def load_settings():
+    global webhook_port
+
+    f = open("settings.json", "r")
+    settings = json.load(f)
+
+    webhook_port = settings["webhook port"]
+
+
 if __name__ == '__main__':
+
+    load_settings()
     
     loop_thread = threading.Thread(target=permanent_loop)
     loop_thread.start()
@@ -182,7 +196,7 @@ if __name__ == '__main__':
     gui_thread = threading.Thread(target=gui_loop)
     gui_thread.start()
 
-    app.run(debug=False, host='0.0.0.0', port=5001)
+    app.run(debug=False, host='0.0.0.0', port=webhook_port)
 
     while True:
         pass

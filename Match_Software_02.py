@@ -21,6 +21,11 @@ state = {"balls" :
 
 time_zero = 0
 
+serial_port = "COM6"
+serial_baudrate = 9600
+display_software_ip = "127.0.0.1"
+webhook_port = "5001"
+
 class BallFinder:
     
     ticks_since_local_maximum = 0
@@ -48,7 +53,7 @@ class BallFinder:
 
 # Function to trigger webhook to Script B
 def trigger_webhook(data):
-    webhook_url = 'http://127.0.0.1:5001/webhook_match_to_display'  # URL of Script B's endpoint
+    webhook_url = f"http://{display_software_ip}:{str(webhook_port)}/webhook_match_to_display"  # URL of Script B's endpoint
     try:
         response = requests.post(webhook_url, json=data)
         if response.status_code == 200:
@@ -92,6 +97,18 @@ def read_serial(ser):
         return data
     else:
         return "XXXX"
+
+def load_settings():
+    global serial_port, serial_baudrate, display_software_ip, webhook_port
+
+    f = open("settings.json", "r")
+    settings = json.load(f)
+
+    serial_port = settings["serial COM port"]
+    serial_baudrate = settings["serial baud rate"]
+    display_software_ip = settings["display software ip"]
+    webhook_port = settings["webhook port"]
+    
 
 
 def calculate_points():
@@ -147,7 +164,9 @@ if __name__ == "__main__":
     last_second = 0
     endgame = False
 
-    ser = serial.Serial('COM6', 9600)
+    load_settings()
+
+    ser = serial.Serial(serial_port, serial_baudrate)
     print("Serial Open")
 
     start_match()

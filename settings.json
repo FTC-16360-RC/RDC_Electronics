@@ -1,0 +1,6 @@
+{
+    "display software ip" : "127.0.0.1",
+    "webhook port" : 5001,
+    "serial COM port" : "COM6",
+    "serial baud rate" : 9600
+}
