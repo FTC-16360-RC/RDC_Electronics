@@ -36,7 +36,7 @@ def read_serial_line():
 
 # Function to trigger webhook to Script B
 def trigger_webhook(data):
-    webhook_url = 'http://localhost:5001/webhook'  # URL of Script B's endpoint
+    webhook_url = 'http://localhost:5001/webhook_match_to_display'  # URL of Script B's endpoint
     try:
         response = requests.post(webhook_url, json=data)
         if response.status_code == 200:
