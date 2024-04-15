@@ -161,6 +161,7 @@ def end_match():
 
 
 if __name__ == "__main__":
+    
     last_second = 0
     endgame = False
 
@@ -197,7 +198,7 @@ if __name__ == "__main__":
         
         if int(time.time()) != last_second:    #decisec anzeige
             last_second = int(time.time())
-            print(f"time match software: {int(time.time() - time_zero/1000)}")
+            print(f"time match software: {int(time.time() - time_zero/1000)} - timestamp: {time.time()}")
 
         if time.time() - time_zero/1000 >= 30 and not endgame:
             print("ENDGAME!!!!")

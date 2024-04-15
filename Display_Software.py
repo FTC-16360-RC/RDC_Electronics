@@ -187,7 +187,7 @@ def load_settings():
 
 
 if __name__ == '__main__':
-
+    
     load_settings()
     
     loop_thread = threading.Thread(target=permanent_loop)
