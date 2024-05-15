@@ -20,7 +20,7 @@ void setup()
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
 
-  Serial.begin(9600);0
+  Serial.begin(9600);
   Wire.begin();
 
   sensor.setTimeout(500);

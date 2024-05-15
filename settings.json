@@ -1,6 +1,13 @@
 {
-    "display software ip" : "192.168.1.167",
-    "webhook port" : 5001,
+    "match duration" : 17,
+    "hold duration" : 4,
+    "endgame duration" : 5,
+
     "serial COM port" : "COM6",
-    "serial baud rate" : 9600
+    "serial baud rate" : 9600,
+
+    "start sound file name" : "start.wav",
+    "end sound file name" : "end.wav",
+    "countdown sound file name" : "countdown.wav",
+    "endgame sound file name" : "endgame.wav"
 }
