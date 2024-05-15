@@ -2,6 +2,7 @@
     "match duration" : 17,
     "hold duration" : 4,
     "endgame duration" : 5,
+    "countdown interval" : 1,
 
     "serial COM port" : "COM6",
     "serial baud rate" : 9600,

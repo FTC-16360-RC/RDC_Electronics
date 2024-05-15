@@ -172,7 +172,7 @@ def permanent_loop():
 
 
 def gui_loop():
-    return
+
     window = Window("scope2")
     window.root.mainloop()
 
