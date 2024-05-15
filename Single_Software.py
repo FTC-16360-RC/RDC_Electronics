@@ -261,54 +261,6 @@ def handle_serial_data(data, ball_finder):
         return False
 
 
-#gui stuff?
-def gui_loop():
-    global time_zero_ns
-    global state
-
-    window = Window(state)
-
-    endgame = False
-    program_running = True
-    match_running = False
-
-    print("Waiting for start time...")
-    while time_zero == 0:    #wait until time_zero is recieved
-        window.change_state("Waiting for start time...")    
-
-    window.change_state("match about to start")
-
-    last_second = 0
-
-    while program_running:
-        window.update()
-        window.update_time(time_zero)
-        window.update_state(state)
-
-        if time.time() >= time_zero and not match_running:
-            window.change_state("match running")
-            match_running = True
-
-        if int(time.time()) != last_second:    #time display (console)
-            last_second = int(time.time())
-            t = int(time.time() - time_zero)
-            print(f"time display software: {t}")
-
-        if time.time_ns() - time_zero_ns >= 30 and not endgame:
-            endgame = True
-            print("ENDGAME!!!!")
-            window.change_state("endgame")
-
-        if time.time() - time_zero >= 40:
-            window.update_time(time_zero)
-            print("END!!!")
-            window.change_state("end")
-            program_running = False
-
-    while True:
-        window.update()
-
-
 if __name__ == "__main__":
 
     load_settings()
