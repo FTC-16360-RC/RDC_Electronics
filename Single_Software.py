@@ -44,7 +44,7 @@ SOUND_COUNTDOWN_PATH = ""
 SOUND_ENDGAME_PATH = ""
 
 SENSOR_SCORING = True
-
+ESP32_ATTACHED = True
 
 
 class Window:
@@ -181,6 +181,12 @@ def log_data(message = ""):
     log.append(copy.deepcopy(state))
 
 
+def send_serial_command(ser, command):
+    print(f"Writing serial command: {command}")
+    log_data(f"serial command {command}")
+    ser.write(command.encode('utf-8'))
+
+
 #one time match related stuff
 def calculate_points():
     points = { "orange" : 0, "blue" : 0 }
@@ -232,7 +238,7 @@ def load_settings():
     global SERIAL_PORT, SERIAL_BAUDRATE, MATCH_DURATION, ENDGAME_DURATION
     global COUNTDOWN_INTERVAL, MATCH_DURATION, HOLD_DURATION
     global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
-    global SENSOR_SCORING
+    global SENSOR_SCORING, ESP32_ATTACHED
 
     f = open("settings.json", "r")
     settings = json.load(f)
@@ -251,6 +257,7 @@ def load_settings():
     SOUND_ENDGAME_PATH = "./Sounds/" + settings["endgame sound file name"]
 
     SENSOR_SCORING = settings["sensor scoring enabled"]
+    ESP32_ATTACHED = settings["eps32 attached"]
 
 
 def handle_serial_data(data, ball_finder):
@@ -337,7 +344,7 @@ if __name__ == "__main__":
 
     #init serial
     ser = "NONE"
-    if(SENSOR_SCORING):
+    if(ESP32_ATTACHED):
         ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
         print("Serial Open")
 
@@ -348,8 +355,6 @@ if __name__ == "__main__":
     last_displayed_timestamp = 0
 
     while True:
-
-
 
         #update window
         window.update()
