@@ -19,9 +19,14 @@ state = {"balls" :
              "94" : 0, 
              "95" : 0},
         "time" : 0,             #time in s
+        "time_ns" : 0,
         "period" : "holding",   #holding, regulation, endgame, finished
         "message" : ""
              }
+
+sounds_to_play = [
+    #[SOUND_PATH, time, played]
+]
 
 time_zero_ns = 0  #before hold duration
 
@@ -30,14 +35,15 @@ SERIAL_BAUDRATE = 9600
 
 HOLD_DURATION = 10
 MATCH_DURATION = 120
-MATCH_DURATION_S = 120
 ENDGAME_DURATION = 30
-COUNTDOWN_INTERVAL_S = 0
+COUNTDOWN_INTERVAL = 1
 
 SOUND_END_PATH = ""
 SOUND_START_PATH = ""
 SOUND_COUNTDOWN_PATH = ""
 SOUND_ENDGAME_PATH = ""
+
+SENSOR_SCORING = True
 
 
 
@@ -166,9 +172,10 @@ class BallFinder:
 
 #helpers
 def play_sound(sound_file):
-    pygame.mixer.init()
+    print(f"loading {sound_file}")
     pygame.mixer.music.load(sound_file)
     pygame.mixer.music.play()
+    print("PLAYSOUND")
 
 
 def log_data(message = ""):
@@ -217,8 +224,9 @@ def read_serial(ser):
 
 def load_settings():
     global SERIAL_PORT, SERIAL_BAUDRATE, MATCH_DURATION, ENDGAME_DURATION
-    global COUNTDOWN_INTERVAL_S, MATCH_DURATION_S, MATCH_DURATION, HOLD_DURATION
+    global COUNTDOWN_INTERVAL, MATCH_DURATION, HOLD_DURATION
     global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
+    global SENSOR_SCORING
 
     f = open("settings.json", "r")
     settings = json.load(f)
@@ -226,8 +234,7 @@ def load_settings():
     SERIAL_PORT = settings["serial COM port"]
     SERIAL_BAUDRATE = settings["serial baud rate"]
 
-    MATCH_DURATION_S = settings["match duration"]
-    COUNTDOWN_INTERVAL_S = settings["countdown interval"]
+    COUNTDOWN_INTERVAL = settings["countdown interval"] * 1000000000
     MATCH_DURATION = settings["match duration"] * 1000000000
     ENDGAME_DURATION = settings["endgame duration"] * 1000000000
     HOLD_DURATION = settings["hold duration"] * 1000000000
@@ -237,9 +244,12 @@ def load_settings():
     SOUND_COUNTDOWN_PATH = "./Sounds/" + settings["countdown sound file name"]
     SOUND_ENDGAME_PATH = "./Sounds/" + settings["endgame sound file name"]
 
+    SENSOR_SCORING = settings["sensor scoring enabled"]
+
 
 def handle_serial_data(data, ball_finder):
-    
+    if not SENSOR_SCORING:
+        return
     state_changed = False
 
     if "Distance at sensor" == data[0:18]:
@@ -261,19 +271,55 @@ def handle_serial_data(data, ball_finder):
         return False
 
 
+def handle_sounds():
+    global sounds_to_play
+
+    for sound in sounds_to_play:
+        #if played
+        if sound[2]:
+            continue
+
+        if state["time_ns"] >= sound[1]:
+            print(f"playing sound {sound[0]}")
+            play_sound(sound[0])
+            sound[2] = True
+        
+
+def play_sound_at_time(sound, time_ns):
+    global sounds_to_play
+
+    #if(time_ns < state["time_ns"]):
+        #return
+    sounds_to_play.append([sound, time_ns, False])
+
+
 if __name__ == "__main__":
 
     load_settings()
 
+    pygame.mixer.quit()
     pygame.mixer.init()
 
+    #set sound timings
+    play_sound_at_time(SOUND_START_PATH, 0)
+    play_sound_at_time(SOUND_ENDGAME_PATH, MATCH_DURATION - ENDGAME_DURATION)
+    play_sound_at_time(SOUND_END_PATH, MATCH_DURATION)
+
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -1 * COUNTDOWN_INTERVAL)
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -2 * COUNTDOWN_INTERVAL)
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -3 * COUNTDOWN_INTERVAL)
+
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -1 * COUNTDOWN_INTERVAL + MATCH_DURATION)
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -2 * COUNTDOWN_INTERVAL + MATCH_DURATION)
+    play_sound_at_time(SOUND_COUNTDOWN_PATH, -3 * COUNTDOWN_INTERVAL + MATCH_DURATION)
+
+    #initialize window
     window = Window(state)
     window.change_state("match about to start")
 
     #time variables
     time_zero_ns = time.time_ns() + HOLD_DURATION
     last_displayed_timestamp = 0
-    countdown_played = False
 
     #init ball finders
     ball_finder_blue_high = BallFinder("29")  #one sensor test
@@ -284,10 +330,11 @@ if __name__ == "__main__":
     ball_finder_orange_mid = BallFinder("94")
     ball_finder_orange_push = BallFinder("95")
 
+    ser = "NONE"
     #init serial
-    print(f"starting at {time_zero_ns}")
-    ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
-    print("Serial Open")
+    if(SENSOR_SCORING):
+        ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
+        print("Serial Open")
 
     while True:
 
@@ -298,6 +345,10 @@ if __name__ == "__main__":
 
         #upate time
         state["time"] = round((time.time_ns() - time_zero_ns) / 1000000000, 4)
+        state["time_ns"] = time.time_ns() - time_zero_ns
+
+        #update sounds
+        handle_sounds()
 
         #match start trigger
         if time.time_ns() >= time_zero_ns and state["period"] == "holding":
@@ -305,7 +356,6 @@ if __name__ == "__main__":
             window.change_state("match running")
             #log_data("game started")
             state["period"] = "regulation"
-            play_sound(SOUND_START_PATH)
 
         #endgame trigger
         if time.time_ns() - time_zero_ns >= (MATCH_DURATION - ENDGAME_DURATION) and state["period"] == "regulation":  
@@ -313,7 +363,6 @@ if __name__ == "__main__":
             window.change_state("endgame")
             #log_data("start of endgame")
             state["period"] = "endgame"
-            play_sound(SOUND_ENDGAME_PATH)
         
         #game end trigger
         if time.time_ns() - time_zero_ns >= MATCH_DURATION and not state["period"] == "finished":
@@ -321,7 +370,6 @@ if __name__ == "__main__":
             window.change_state("end")
             #log_data("finished")
             state["period"] = "finished"
-            play_sound(SOUND_END_PATH)
             end_match()
 
             #end loop
@@ -330,7 +378,7 @@ if __name__ == "__main__":
 
         
         #read balls and log stuff
-        if(state["period"] == "endgame" or state["period"] == "regulation"):
+        if((state["period"] == "endgame" or state["period"] == "regulation") and SENSOR_SCORING):
             data = read_serial(ser)
 
             a = handle_serial_data(data, ball_finder_blue_high)
@@ -342,46 +390,8 @@ if __name__ == "__main__":
             f = handle_serial_data(data, ball_finder_orange_push)
 
         #decisec display
-        if time.time_ns() >= last_displayed_timestamp + 250000000:    
+        if time.time_ns() >= last_displayed_timestamp + 250000000:   
             last_displayed_timestamp = time.time_ns()
             t = state["time"]
-            print(f"time match software: {t} - timestamp: {time.time_ns()}")
-
-        #countdowns
-        if state["period"] == "holding":
-            if state["time"] >= -3 * COUNTDOWN_INTERVAL_S and state["time"] < -2.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > -2.5 * COUNTDOWN_INTERVAL_S and state["time"] < -2 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
-
-            if state["time"] >= -2 * COUNTDOWN_INTERVAL_S and state["time"] < -1.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > -1.5 * COUNTDOWN_INTERVAL_S and state["time"] < -1 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
-
-            if state["time"] >= -1 * COUNTDOWN_INTERVAL_S and state["time"] < -0.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > -0.5 * COUNTDOWN_INTERVAL_S and state["time"] < 0 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
-
-        if state["period"] == "endgame":
-            if state["time"] >= MATCH_DURATION_S - 3 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 2.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > MATCH_DURATION_S - 2.5 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 2 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
-
-            if state["time"] >= MATCH_DURATION_S - 2 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 1.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > MATCH_DURATION_S - 1.5 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 1 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
-
-            if state["time"] >= MATCH_DURATION_S - 1 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 0.5 * COUNTDOWN_INTERVAL_S and not countdown_played:
-                countdown_played = True
-                play_sound(SOUND_COUNTDOWN_PATH)
-            if state["time"] > MATCH_DURATION_S - 0.5 * COUNTDOWN_INTERVAL_S and state["time"] < MATCH_DURATION_S - 0 * COUNTDOWN_INTERVAL_S and countdown_played:
-                countdown_played = False
+            t_ns = state["time_ns"]
+            print(f"time match software: {t} - time ns: {t_ns}")

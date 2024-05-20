@@ -10,5 +10,7 @@
     "start sound file name" : "start.wav",
     "end sound file name" : "end.wav",
     "countdown sound file name" : "countdown.wav",
-    "endgame sound file name" : "endgame.wav"
+    "endgame sound file name" : "endgame.wav",
+
+    "sensor scoring enabled" : true
 }
