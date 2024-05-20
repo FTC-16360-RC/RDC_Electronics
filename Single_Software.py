@@ -172,10 +172,8 @@ class BallFinder:
 
 #helpers
 def play_sound(sound_file):
-    print(f"loading {sound_file}")
     pygame.mixer.music.load(sound_file)
     pygame.mixer.music.play()
-    print("PLAYSOUND")
 
 
 def log_data(message = ""):
@@ -288,7 +286,6 @@ def handle_sounds():
             continue
 
         if state["time_ns"] >= sound[1]:
-            print(f"playing sound {sound[0]}")
             play_sound(sound[0])
             sound[2] = True
         
@@ -303,8 +300,12 @@ def play_sound_at_time(sound, time_ns):
 
 if __name__ == "__main__":
 
+    #settings
     load_settings()
+    if not SENSOR_SCORING:
+        print("\n!!!SENSORS NOT ACTIVE!!!")
 
+    #sound mixer
     pygame.mixer.quit()
     pygame.mixer.init()
 
