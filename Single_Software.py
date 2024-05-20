@@ -193,6 +193,8 @@ def log_data(message = ""):
 def send_serial_command(command):
     global ser
 
+    if not ESP32_ATTACHED:
+        return
     print(f"Writing serial command: {command}")
     log_data(f"serial command {command}")
     ser.write(command.encode('utf-8'))
@@ -293,8 +295,10 @@ def load_settings():
     ESP32_ATTACHED = settings["eps32 attached"]
 
     BALL_DROP_1 = settings["first ball drop"] * 1000000000
-    BALL_DROP_1 = settings["second ball drop"] * 1000000000
-    BALL_DROP_1 = settings["third ball drop"] * 1000000000
+    BALL_DROP_2 = settings["second ball drop"] * 1000000000
+    BALL_DROP_3 = settings["third ball drop"] * 1000000000
+
+    f.close()
 
 
 
@@ -406,6 +410,8 @@ if __name__ == "__main__":
     schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "BLU_TOP_OPEN"])
     schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "RED_TOP_OPEN"])
     #---------
+
+    print(events)
 
     #initialize window
     window = Window(state)
