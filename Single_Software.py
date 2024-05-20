@@ -212,6 +212,14 @@ def end_match():
     print("written log to file")
     print("press ctr + c to exit...")
 
+
+def wait_for_start(window):
+    print("Press <space> to run match")
+    print("--waiting--")    
+    while not keyboard.is_pressed("space"):
+        window.update()
+    window.change_state("Match about to start")
+
 #...
 def read_serial(ser):
 
@@ -315,11 +323,7 @@ if __name__ == "__main__":
 
     #initialize window
     window = Window(state)
-    window.change_state("match about to start")
-
-    #time variables
-    time_zero_ns = time.time_ns() + HOLD_DURATION
-    last_displayed_timestamp = 0
+    window.change_state("Waiting for thumbs up")
 
     #init ball finders
     ball_finder_blue_high = BallFinder("29")  #one sensor test
@@ -330,13 +334,21 @@ if __name__ == "__main__":
     ball_finder_orange_mid = BallFinder("94")
     ball_finder_orange_push = BallFinder("95")
 
-    ser = "NONE"
     #init serial
+    ser = "NONE"
     if(SENSOR_SCORING):
         ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
         print("Serial Open")
 
+    wait_for_start(window)
+
+    #time variables
+    time_zero_ns = time.time_ns() + HOLD_DURATION
+    last_displayed_timestamp = 0
+
     while True:
+
+
 
         #update window
         window.update()
