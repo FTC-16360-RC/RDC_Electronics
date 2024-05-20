@@ -24,9 +24,14 @@ state = {"balls" :
         "message" : ""
              }
 
-sounds_to_play = [
-    #[SOUND_PATH, time, played]
+events = [
+    #[Event Type, time, executed, args...] general
+    #["SERIAL_MESSAGE", time, executed, Serial Message] serial
+    #["PLAY_SOUND", time, executed, SOUND_PATH] sounds
 ]
+
+ser = "SERIAL HERE"
+window = "WINDOW HERE"
 
 time_zero_ns = 0  #before hold duration
 
@@ -181,7 +186,9 @@ def log_data(message = ""):
     log.append(copy.deepcopy(state))
 
 
-def send_serial_command(ser, command):
+def send_serial_command(command):
+    global ser
+
     print(f"Writing serial command: {command}")
     log_data(f"serial command {command}")
     ser.write(command.encode('utf-8'))
@@ -202,7 +209,24 @@ def calculate_points():
     return points
 
 
+def start_regulation():
+    print("Game Started")
+    window.change_state("match running")
+    #log_data("game started")
+    state["period"] = "regulation"
+
+
+def start_endgame():
+    print("ENDGAME!!!!")
+    window.change_state("endgame")
+    #log_data("start of endgame")
+    state["period"] = "endgame"
+
+
 def end_match():
+    window.change_state("end")
+    state["period"] = "finished"
+
     print("END!!!")
     
     points = calculate_points()
@@ -215,6 +239,10 @@ def end_match():
 
     print("written log to file")
     print("press ctr + c to exit...")
+    
+    #end loop
+    while True:
+        window.update()
 
 
 def wait_for_start(window):
@@ -284,25 +312,48 @@ def handle_serial_data(data, ball_finder):
         return False
 
 
-def handle_sounds():
-    global sounds_to_play
+def handle_scheduled_events():
+    global events
 
-    for sound in sounds_to_play:
-        #if played
-        if sound[2]:
+    for event in events:
+        #if executed
+        if event[2]:
             continue
 
-        if state["time_ns"] >= sound[1]:
-            play_sound(sound[0])
-            sound[2] = True
+        #check if we don't have to execute event yet
+        if state["time_ns"] < event[1]:
+            continue
         
+        if event[0] == "PLAY_SOUND":
+            play_sound(event[3])
+            event[2] = True
+            continue
+        
+        if event[0] == "SERIAL_MESSAGE":
+            send_serial_command(event[3])
+            event[2] = True
+            continue
+        
+        if event[0] == "START_REGULATION":
+            start_regulation()
+            event[2] = True
+            continue
+        
+        if event[0] == "START_ENDGAME":
+            start_endgame()
+            event[2] = True
+            continue
 
-def play_sound_at_time(sound, time_ns):
-    global sounds_to_play
+        if event[0] == "END_MATCH":
+            end_match()
+            event[2] = True
+            continue
 
-    #if(time_ns < state["time_ns"]):
-        #return
-    sounds_to_play.append([sound, time_ns, False])
+
+def schedule_event(event):
+    global events
+
+    events.append(event)
 
 
 if __name__ == "__main__":
@@ -317,17 +368,25 @@ if __name__ == "__main__":
     pygame.mixer.init()
 
     #set sound timings
-    play_sound_at_time(SOUND_START_PATH, 0)
-    play_sound_at_time(SOUND_ENDGAME_PATH, MATCH_DURATION - ENDGAME_DURATION)
-    play_sound_at_time(SOUND_END_PATH, MATCH_DURATION)
+    schedule_event(["PLAY_SOUND", 0, False, SOUND_START_PATH])
+    schedule_event(["PLAY_SOUND", MATCH_DURATION - ENDGAME_DURATION, False, SOUND_ENDGAME_PATH])
+    schedule_event(["PLAY_SOUND", MATCH_DURATION, False, SOUND_END_PATH])
 
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -1 * COUNTDOWN_INTERVAL)
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -2 * COUNTDOWN_INTERVAL)
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -3 * COUNTDOWN_INTERVAL)
+    schedule_event(["PLAY_SOUND", -1 * COUNTDOWN_INTERVAL, False, SOUND_COUNTDOWN_PATH])
+    schedule_event(["PLAY_SOUND", -2 * COUNTDOWN_INTERVAL, False, SOUND_COUNTDOWN_PATH])
+    schedule_event(["PLAY_SOUND", -3 * COUNTDOWN_INTERVAL, False, SOUND_COUNTDOWN_PATH])
 
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -1 * COUNTDOWN_INTERVAL + MATCH_DURATION)
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -2 * COUNTDOWN_INTERVAL + MATCH_DURATION)
-    play_sound_at_time(SOUND_COUNTDOWN_PATH, -3 * COUNTDOWN_INTERVAL + MATCH_DURATION)
+    schedule_event(["PLAY_SOUND", -1 * COUNTDOWN_INTERVAL + MATCH_DURATION, False, SOUND_COUNTDOWN_PATH])
+    schedule_event(["PLAY_SOUND", -2 * COUNTDOWN_INTERVAL + MATCH_DURATION, False, SOUND_COUNTDOWN_PATH])
+    schedule_event(["PLAY_SOUND", -3 * COUNTDOWN_INTERVAL + MATCH_DURATION, False, SOUND_COUNTDOWN_PATH])
+
+    #schedule match events
+    schedule_event(["START_REGULATION", 0, False]) 
+    schedule_event(["START_ENDGAME", MATCH_DURATION - ENDGAME_DURATION, False]) 
+    schedule_event(["END_MATCH", MATCH_DURATION, False]) 
+
+    #set Ball Tower timings
+    #schedule_event(["SERIAL_MESSAGE", 0, False, "RED_TOP_OPEN"])
 
     #initialize window
     window = Window(state)
@@ -343,7 +402,6 @@ if __name__ == "__main__":
     ball_finder_orange_push = BallFinder("95")
 
     #init serial
-    ser = "NONE"
     if(ESP32_ATTACHED):
         ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
         print("Serial Open")
@@ -365,35 +423,8 @@ if __name__ == "__main__":
         state["time"] = round((time.time_ns() - time_zero_ns) / 1000000000, 4)
         state["time_ns"] = time.time_ns() - time_zero_ns
 
-        #update sounds
-        handle_sounds()
-
-        #match start trigger
-        if time.time_ns() >= time_zero_ns and state["period"] == "holding":
-            print("Game Started")
-            window.change_state("match running")
-            #log_data("game started")
-            state["period"] = "regulation"
-
-        #endgame trigger
-        if time.time_ns() - time_zero_ns >= (MATCH_DURATION - ENDGAME_DURATION) and state["period"] == "regulation":  
-            print("ENDGAME!!!!")
-            window.change_state("endgame")
-            #log_data("start of endgame")
-            state["period"] = "endgame"
-        
-        #game end trigger
-        if time.time_ns() - time_zero_ns >= MATCH_DURATION and not state["period"] == "finished":
-            print("Game Over")
-            window.change_state("end")
-            #log_data("finished")
-            state["period"] = "finished"
-            end_match()
-
-            #end loop
-            while True:
-                window.update()
-
+        #update scheduled events
+        handle_scheduled_events()
         
         #read balls and log stuff
         if((state["period"] == "endgame" or state["period"] == "regulation") and SENSOR_SCORING):
