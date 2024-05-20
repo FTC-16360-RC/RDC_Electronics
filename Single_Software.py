@@ -48,6 +48,10 @@ SOUND_START_PATH = ""
 SOUND_COUNTDOWN_PATH = ""
 SOUND_ENDGAME_PATH = ""
 
+BALL_DROP_1 = 0
+BALL_DROP_2 = 0
+BALL_DROP_3 = 0
+
 SENSOR_SCORING = True
 ESP32_ATTACHED = True
 
@@ -267,6 +271,7 @@ def load_settings():
     global COUNTDOWN_INTERVAL, MATCH_DURATION, HOLD_DURATION
     global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
     global SENSOR_SCORING, ESP32_ATTACHED
+    global BALL_DROP_1, BALL_DROP_2, BALL_DROP_3
 
     f = open("settings.json", "r")
     settings = json.load(f)
@@ -286,6 +291,11 @@ def load_settings():
 
     SENSOR_SCORING = settings["sensor scoring enabled"]
     ESP32_ATTACHED = settings["eps32 attached"]
+
+    BALL_DROP_1 = settings["first ball drop"] * 1000000000
+    BALL_DROP_1 = settings["second ball drop"] * 1000000000
+    BALL_DROP_1 = settings["third ball drop"] * 1000000000
+
 
 
 def handle_serial_data(data, ball_finder):
@@ -367,6 +377,7 @@ if __name__ == "__main__":
     pygame.mixer.quit()
     pygame.mixer.init()
 
+    #----Schedule Events-----
     #set sound timings
     schedule_event(["PLAY_SOUND", 0, False, SOUND_START_PATH])
     schedule_event(["PLAY_SOUND", MATCH_DURATION - ENDGAME_DURATION, False, SOUND_ENDGAME_PATH])
@@ -385,8 +396,16 @@ if __name__ == "__main__":
     schedule_event(["START_ENDGAME", MATCH_DURATION - ENDGAME_DURATION, False]) 
     schedule_event(["END_MATCH", MATCH_DURATION, False]) 
 
-    #set Ball Tower timings
-    #schedule_event(["SERIAL_MESSAGE", 0, False, "RED_TOP_OPEN"])
+    #set Ball Tower Servo serial timings
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "BLU_LOW_OPEN"])
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "RED_LOW_OPEN"])
+
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "BLU_MID_OPEN"])
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "RED_MID_OPEN"])
+
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "BLU_TOP_OPEN"])
+    schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "RED_TOP_OPEN"])
+    #---------
 
     #initialize window
     window = Window(state)
