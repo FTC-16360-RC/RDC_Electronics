@@ -7,17 +7,17 @@ import json
 import pygame
 import tkinter as tk
 import threading
-
+import Scorer
 
 log = []
 
 state = {"balls" : 
-            {"29" : 0, 
-             "91" : 0, 
-             "92" : 0, 
-             "93" : 0, 
-             "94" : 0, 
-             "95" : 0},
+            {"blu_top" : 0, 
+             "blu_mid" : 0, 
+             "blu_low" : 0, 
+             "red_top" : 0, 
+             "red_mid" : 0, 
+             "red_low" : 0},
         "time" : 0,             #time in s
         "time_ns" : 0,
         "period" : "holding",   #holding, regulation, endgame, finished
@@ -81,22 +81,22 @@ class Window:
         self.frame.grid_columnconfigure((0, 1, 2), weight=1)
 
         #setting up labels
-        self.balls_orange_top = tk.Label(self.frame, text=state["balls"]["29"])
-        self.balls_orange_mid = tk.Label(self.frame, text=state["balls"]["91"])
-        self.balls_orange_push = tk.Label(self.frame, text=state["balls"]["92"])
-        self.balls_blue_top = tk.Label(self.frame, text=state["balls"]["93"])
-        self.balls_blue_mid = tk.Label(self.frame, text=state["balls"]["94"])
-        self.balls_blue_push = tk.Label(self.frame, text=state["balls"]["95"])
+        self.balls_red_top = tk.Label(self.frame, text=state["balls"]["red_top"])
+        self.balls_red_mid = tk.Label(self.frame, text=state["balls"]["red_mid"])
+        self.balls_red_low = tk.Label(self.frame, text=state["balls"]["red_low"])
+        self.balls_blu_top = tk.Label(self.frame, text=state["balls"]["blu_top"])
+        self.balls_blu_mid = tk.Label(self.frame, text=state["balls"]["blu_mid"])
+        self.balls_blu_low = tk.Label(self.frame, text=state["balls"]["blu_low"])
 
         self.time_label = tk.Label(self.frame, text="time")
         self.state_label = tk.Label(self.frame, text="state")
 
-        self.balls_orange_top.grid(row=2, column=0, padx=10, pady=10)
-        self.balls_orange_mid.grid(row=3, column=0, padx=10, pady=10)
-        self.balls_orange_push.grid(row=4, column=0, padx=10, pady=10)
-        self.balls_blue_top.grid(row=2, column=2, padx=10, pady=10)
-        self.balls_blue_mid.grid(row=3, column=2, padx=10, pady=10)
-        self.balls_blue_push.grid(row=4, column=2, padx=10, pady=10)
+        self.balls_red_top.grid(row=2, column=0, padx=10, pady=10)
+        self.balls_red_mid.grid(row=3, column=0, padx=10, pady=10)
+        self.balls_red_low.grid(row=4, column=0, padx=10, pady=10)
+        self.balls_blu_top.grid(row=2, column=2, padx=10, pady=10)
+        self.balls_blu_mid.grid(row=3, column=2, padx=10, pady=10)
+        self.balls_blu_low.grid(row=4, column=2, padx=10, pady=10)
 
         self.time_label.grid(row=0, column=1, padx=10, pady=10)
         self.state_label.grid(row=1, column=0, padx=10, pady=10)
@@ -111,12 +111,12 @@ class Window:
         self.root.update()
 
     def update_state(self, state):
-        self.balls_orange_top.config(text=state["balls"]["29"])
-        self.balls_orange_mid.config(text=state["balls"]["91"])
-        self.balls_orange_push.config(text=state["balls"]["92"])
-        self.balls_blue_top.config(text=state["balls"]["93"])
-        self.balls_blue_mid.config(text=state["balls"]["94"])
-        self.balls_blue_push.config(text=state["balls"]["95"])
+        self.balls_red_top.config(text=state["balls"]["red_top"])
+        self.balls_red_mid.config(text=state["balls"]["red_mid"])
+        self.balls_red_low.config(text=state["balls"]["red_low"])
+        self.balls_blu_top.config(text=state["balls"]["blu_top"])
+        self.balls_blu_mid.config(text=state["balls"]["blu_mid"])
+        self.balls_blu_low.config(text=state["balls"]["blu_low"])
         self.root.update()
 
     def update_time(self, time_zero_ns):
@@ -158,10 +158,12 @@ class BallFinder:
     ticks_since_local_maximum = 0
     local_maximum = 0
     sensor_id = ""
+    position = ""
     last_x = 0
 
-    def __init__(self, id):
+    def __init__(self, id, pos):
         self.sensor_id = id
+        self.position = pos
     
     def new_datapoint(self, x):
         if x > 200:
@@ -204,13 +206,13 @@ def send_serial_command(command):
 def calculate_points():
     points = { "orange" : 0, "blue" : 0 }
     
-    points["orange"] = int(state["balls"]["29"]) * 14
-    points["orange"] += int(state["balls"]["91"]) * 7
-    points["orange"] += int(state["balls"]["92"]) * 5
+    points["orange"] = int(state["balls"]["red_top"]) * 14
+    points["orange"] += int(state["balls"]["red_mid"]) * 7
+    points["orange"] += int(state["balls"]["red_low"]) * 5
 
-    points["blue"] = int(state["balls"]["93"]) * 14
-    points["blue"] += int(state["balls"]["94"]) * 7
-    points["blue"] += int(state["balls"]["95"]) * 5
+    points["blue"] = int(state["balls"]["blu_top"]) * 14
+    points["blue"] += int(state["balls"]["blu_mid"]) * 7
+    points["blue"] += int(state["balls"]["blu_low"]) * 5
 
     return points
 
@@ -234,6 +236,12 @@ def end_match():
     state["period"] = "finished"
 
     print("END!!!")
+
+    scorer = Scorer.Scorer()
+
+    print("press <ENTER> to confirm points")
+    while not keyboard.is_pressed('enter'):
+        scorer.update()
     
     points = calculate_points()
     log.append({"end points: " : points})
@@ -301,22 +309,22 @@ def load_settings():
     f.close()
 
 
-
 def handle_serial_data(data, ball_finder):
     if not SENSOR_SCORING:
         return
     state_changed = False
 
     if "Distance at sensor" == data[0:18]:
-        address = data[19:21]
+        i2c_address = data[19:21]
         distance = data[23:]
 
-        if address != ball_finder.sensor_id:
+        if i2c_address != ball_finder.sensor_id:
             return
 
+        position = ball_finder.position
         ball_finder.new_datapoint(int(distance))
         if ball_finder.check_for_ball():
-            state["balls"][address] = state["balls"][address] + 1
+            state["balls"][position] = state["balls"][position] + 1
             log_data("ball")
             state_changed = True
             print("-sensed ball!")
@@ -418,13 +426,13 @@ if __name__ == "__main__":
     window.change_state("Waiting for thumbs up")
 
     #init ball finders
-    ball_finder_blue_high = BallFinder("29")  #one sensor test
-    ball_finder_blue_mid = BallFinder("91")
-    ball_finder_blue_push = BallFinder("92")
+    ball_finder_blu_top = BallFinder("29", "blu_top")  #one sensor test
+    ball_finder_blu_mid = BallFinder("91", "blu_mid")
+    ball_finder_blu_low = BallFinder("92", "blu_low")
 
-    ball_finder_orange_high = BallFinder("93")
-    ball_finder_orange_mid = BallFinder("94")
-    ball_finder_orange_push = BallFinder("95")
+    ball_finder_red_top = BallFinder("93", "red_top")
+    ball_finder_red_mid = BallFinder("94", "red_mid")
+    ball_finder_red_low = BallFinder("95", "red_low")
 
     #init serial
     if(ESP32_ATTACHED):
@@ -455,13 +463,13 @@ if __name__ == "__main__":
         if((state["period"] == "endgame" or state["period"] == "regulation") and SENSOR_SCORING):
             data = read_serial(ser)
 
-            a = handle_serial_data(data, ball_finder_blue_high)
-            b = handle_serial_data(data, ball_finder_blue_mid)
-            c = handle_serial_data(data, ball_finder_blue_push)
+            a = handle_serial_data(data, ball_finder_blu_top)
+            b = handle_serial_data(data, ball_finder_blu_mid)
+            c = handle_serial_data(data, ball_finder_blu_low)
             
-            d = handle_serial_data(data, ball_finder_orange_high)
-            e = handle_serial_data(data, ball_finder_orange_mid)
-            f = handle_serial_data(data, ball_finder_orange_push)
+            d = handle_serial_data(data, ball_finder_red_top)
+            e = handle_serial_data(data, ball_finder_red_mid)
+            f = handle_serial_data(data, ball_finder_red_low)
 
         #decisec display
         if time.time_ns() >= last_displayed_timestamp + 250000000:   

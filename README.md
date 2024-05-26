@@ -1,12 +1,3 @@
-Settings in Settings.json
-
-Servo Commands from python to esp:
-RED OPEN
-BLU OPEN
-RED CLOSE
-BLU CLOSE
-
-
 
 
 Setup Instructions:
