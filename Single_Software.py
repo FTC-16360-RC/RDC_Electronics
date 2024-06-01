@@ -58,9 +58,12 @@ BALL_DROP_3 = 0
 SENSOR_SCORING = True
 ESP32_ATTACHED = True
 
+MANUAL_SCORING = False
+
 updating_state_gui = False
 updating_time_gui = False
 
+scorer = ''
 
 
 class Window:
@@ -110,7 +113,7 @@ class Window:
 
 
         self.root.resizable(True, True)
-        self.update(state)
+        self.update()
     
 
     def change_state(self, new_state):
@@ -155,9 +158,10 @@ class Window:
         self.root.update()
 
             
-    def update(self, state):
+    def update(self):
         global updating_state_gui
         global updating_time_gui
+        global state
 
         if updating_state_gui:
             self.update_state(state)
@@ -249,7 +253,7 @@ def start_endgame():
     state["period"] = "endgame"
 
 
-def run_manual_scoring(scorer):
+def run_manual_scoring():
     global state
 
     new_entry = scorer.pop_top()
@@ -266,21 +270,19 @@ def run_manual_scoring(scorer):
 
 
 def end_match():
-    
     global updating_time_gui
+
     updating_time_gui = False
 
     window.change_state("end")
     state["period"] = "finished"
 
-    scorer = Scorer.Scorer()
-
     print("END!!!")
 
     print("press <ENTER> to confirm points")
     while not keyboard.is_pressed('enter'):
-        run_manual_scoring(scorer)
-        window.update(state)
+        run_manual_scoring()
+        window.update()
     
     points = calculate_points()
     log.append({"end points: " : points})
@@ -291,18 +293,18 @@ def end_match():
     f.close()
 
     print("written log to file")
-    print("press ctr + c to exit...")
+    print("ctrl + c doesn't work, figure it out :)")
     
     #end loop
     while True:
-        window.update(state)
+        window.update()
 
 
 def wait_for_start(window):
     print("Press <space> to run match")
     print("--waiting--")    
     while not keyboard.is_pressed("space"):
-        window.update(state)
+        window.update()
     window.change_state("Match about to start")
 
 #...
@@ -321,6 +323,7 @@ def load_settings():
     global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
     global SENSOR_SCORING, ESP32_ATTACHED
     global BALL_DROP_1, BALL_DROP_2, BALL_DROP_3
+    global MANUAL_SCORING
 
     f = open("settings.json", "r")
     settings = json.load(f)
@@ -344,6 +347,8 @@ def load_settings():
     BALL_DROP_1 = settings["first ball drop"] * 1000000000
     BALL_DROP_2 = settings["second ball drop"] * 1000000000
     BALL_DROP_3 = settings["third ball drop"] * 1000000000
+
+    MANUAL_SCORING = settings["manual scoring"]
 
     f.close()
 
@@ -460,6 +465,9 @@ if __name__ == "__main__":
 
     print(events)
 
+    #initialize socrer
+    scorer = Scorer.Scorer()
+
     #initialize window
     window = Window(state)
     window.change_state("Waiting for thumbs up")
@@ -492,11 +500,15 @@ if __name__ == "__main__":
     while True:
 
         #update window
-        window.update(state)
+        window.update()
 
         #upate time
         state["time"] = round((time.time_ns() - time_zero_ns) / 1000000000, 4)
         state["time_ns"] = time.time_ns() - time_zero_ns
+
+        #manual scoring
+        if MANUAL_SCORING:
+            run_manual_scoring()
 
         #update scheduled events
         handle_scheduled_events()

@@ -28,114 +28,117 @@ class Scorer:
         category = ""
         position = ""
         change = 0
+        try:
+            if key.char == 'q':
+                category = "balls"
+                position = "blu_top"
+                change = 1
+            
+            if key.char == 'w':
+                category = "balls"
+                position = "blu_top"
+                change = -1
 
-        if key.char == 'q':
-            category = "balls"
-            position = "blu_top"
-            change = 1
-        
-        if key.char == 'w':
-            category = "balls"
-            position = "blu_top"
-            change = -1
+            if key.char == 'a':
+                category = "balls"
+                position = "blu_mid"
+                change = 1
 
-        if key.char == 'a':
-            category = "balls"
-            position = "blu_mid"
-            change = 1
+            if key.char == 's':
+                category = "balls"
+                position = "blu_mid"
+                change = -1
 
-        if key.char == 's':
-            category = "balls"
-            position = "blu_mid"
-            change = -1
+            if key.char == 'y':
+                category = "balls"
+                position = "blu_low"
+                change = 1
 
-        if key.char == 'y':
-            category = "balls"
-            position = "blu_low"
-            change = 1
-
-        if key.char == 'x':
-            category = "balls"
-            position = "blu_low"
-            change = -1
-
-
-        if key.char == 'e':
-            category = "balls"
-            position = "red_top"
-            change = 1
-        
-        if key.char == 'r':
-            category = "balls"
-            position = "red_top"
-            change = -1
-
-        if key.char == 'd':
-            category = "balls"
-            position = "red_mid"
-            change = 1
-
-        if key.char == 'f':
-            category = "balls"
-            position = "red_mid"
-            change = -1
-
-        if key.char == 'c':
-            category = "balls"
-            position = "red_low"
-            change = 1
-
-        if key.char == 'v':
-            category = "balls"
-            position = "red_low"
-            change = -1
+            if key.char == 'x':
+                category = "balls"
+                position = "blu_low"
+                change = -1
 
 
-        if key.char == 't':
-            category = "penalty points"
-            position = "blu"
-            change = 25
+            if key.char == 'e':
+                category = "balls"
+                position = "red_top"
+                change = 1
+            
+            if key.char == 'r':
+                category = "balls"
+                position = "red_top"
+                change = -1
 
-        if key.char == 'z':
-            category = "penalty points"
-            position = "blu"
-            change = -25
+            if key.char == 'd':
+                category = "balls"
+                position = "red_mid"
+                change = 1
 
-        if key.char == 'g':
-            category = "penalty points"
-            position = "blu"
-            change = 10
+            if key.char == 'f':
+                category = "balls"
+                position = "red_mid"
+                change = -1
 
-        if key.char == 'h':
-            category = "penalty points"
-            position = "blu"
-            change = -10
+            if key.char == 'c':
+                category = "balls"
+                position = "red_low"
+                change = 1
 
-
-        if key.char == 'u':
-            category = "penalty points"
-            position = "red"
-            change = 25
-
-        if key.char == 'i':
-            category = "penalty points"
-            position = "red"
-            change = -25
-
-        if key.char == 'j':
-            category = "penalty points"
-            position = "red"
-            change = 10
-
-        if key.char == 'k':
-            category = "penalty points"
-            position = "red"
-            change = -10
+            if key.char == 'v':
+                category = "balls"
+                position = "red_low"
+                change = -1
 
 
-        if position != '':
-            self.events.append({"category": category, "position" : position, "change" : change})
-            #print(f"pressed {key.char}")
+            if key.char == 't':
+                category = "penalty points"
+                position = "blu"
+                change = 25
+
+            if key.char == 'z':
+                category = "penalty points"
+                position = "blu"
+                change = -25
+
+            if key.char == 'g':
+                category = "penalty points"
+                position = "blu"
+                change = 10
+
+            if key.char == 'h':
+                category = "penalty points"
+                position = "blu"
+                change = -10
+
+
+            if key.char == 'u':
+                category = "penalty points"
+                position = "red"
+                change = 25
+
+            if key.char == 'i':
+                category = "penalty points"
+                position = "red"
+                change = -25
+
+            if key.char == 'j':
+                category = "penalty points"
+                position = "red"
+                change = 10
+
+            if key.char == 'k':
+                category = "penalty points"
+                position = "red"
+                change = -10
+
+
+            if position != '':
+                self.events.append({"category": category, "position" : position, "change" : change})
+                #print(f"pressed {key.char}")
+
+        except:
+            return
 
     def __init__(self):
         global listener
