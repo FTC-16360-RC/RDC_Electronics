@@ -278,8 +278,9 @@ def end_match():
     state["period"] = "finished"
 
     print("END!!!")
-
     print("press <ENTER> to confirm points")
+
+    scorer.clear()
     while not keyboard.is_pressed('enter'):
         run_manual_scoring()
         window.update()
@@ -331,10 +332,10 @@ def load_settings():
     SERIAL_PORT = settings["serial COM port"]
     SERIAL_BAUDRATE = settings["serial baud rate"]
 
-    COUNTDOWN_INTERVAL = settings["countdown interval"] * 1000000000
-    MATCH_DURATION = settings["match duration"] * 1000000000
-    ENDGAME_DURATION = settings["endgame duration"] * 1000000000
-    HOLD_DURATION = settings["hold duration"] * 1000000000
+    COUNTDOWN_INTERVAL = settings["countdown interval"] * 1e9
+    MATCH_DURATION = settings["match duration"] * 1e9
+    ENDGAME_DURATION = settings["endgame duration"] * 1e9
+    HOLD_DURATION = settings["hold duration"] * 1e9
     
     SOUND_START_PATH = "./Sounds/" + settings["start sound file name"]
     SOUND_END_PATH = "./Sounds/" + settings["end sound file name"]
@@ -344,9 +345,9 @@ def load_settings():
     SENSOR_SCORING = settings["sensor scoring enabled"]
     ESP32_ATTACHED = settings["eps32 attached"]
 
-    BALL_DROP_1 = settings["first ball drop"] * 1000000000
-    BALL_DROP_2 = settings["second ball drop"] * 1000000000
-    BALL_DROP_3 = settings["third ball drop"] * 1000000000
+    BALL_DROP_1 = settings["first ball drop"] * 1e9
+    BALL_DROP_2 = settings["second ball drop"] * 1e9
+    BALL_DROP_3 = settings["third ball drop"] * 1e9
 
     MANUAL_SCORING = settings["manual scoring"]
 

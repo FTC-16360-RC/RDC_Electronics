@@ -19,5 +19,5 @@
     "second ball drop" : 5,
     "third ball drop" : 7,
 
-    "manual scoring" : true
+    "manual scoring" : false
 }

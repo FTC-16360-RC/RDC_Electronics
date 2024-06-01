@@ -156,3 +156,6 @@ class Scorer:
             return self.events.pop(0)
         else:
             return "empty"
+
+    def clear(self):
+        self.events = []
