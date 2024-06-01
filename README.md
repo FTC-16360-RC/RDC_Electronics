@@ -1,4 +1,5 @@
-
+Nicoooooo?
+lueg ma i Single_Software.py d class Window aa. D functionality isch scho implemented
 
 Setup Instructions:
   1. Adjust settings.json if needed
