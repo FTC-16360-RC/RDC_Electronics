@@ -231,17 +231,24 @@ def start_endgame():
     state["period"] = "endgame"
 
 
+def run_manual_scoring(scorer):
+    scorer.update()
+    position = scorer.pop_top()["position"]
+    change = scorer.pop_top()["change"]
+    state["balls"][position] + state["balls"][position] + change
+
+
 def end_match():
     window.change_state("end")
     state["period"] = "finished"
 
-    print("END!!!")
-
     scorer = Scorer.Scorer()
+
+    print("END!!!")
 
     print("press <ENTER> to confirm points")
     while not keyboard.is_pressed('enter'):
-        scorer.update()
+        run_manual_scoring(scorer)
     
     points = calculate_points()
     log.append({"end points: " : points})
