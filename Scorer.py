@@ -1,85 +1,155 @@
-import keyboard
+import pynput.keyboard as pkeyboard
 
 
 class Scorer:    
 
-    events = [] #[{"position" : ..., "change" : ...}, {...}, ...]
+    #category: "penalty points" / "balls" 
+    #[{"category": ...., "position" : ..., "change" : ...}, {...}, ...]
+    events = [] 
+    listener = ''
 
     some_key_pressed = False
+    pressed_key = ''
 
-    def release_handler(event):
+    def release_handler(self, key):
         global some_key_pressed
-        some_key_pressed = False
+        global pressed_key
+        if key == self.pressed_key:
+            self.some_key_pressed = False   
+            #print(f"released {self.pressed_key}")
+        
 
-    def press_handler(event):
-        global some_key_pressed
-        if some_key_pressed:
+    def press_handler(self, key):
+        if self.some_key_pressed:
             return
-        some_key_pressed = True
+        self.some_key_pressed = True
+        self.pressed_key = key
 
-        key = event.name
+        category = ""
         position = ""
         change = 0
 
-        if key == 'q':
+        if key.char == 'q':
+            category = "balls"
             position = "blu_top"
             change = 1
         
-        if key == 'w':
+        if key.char == 'w':
+            category = "balls"
             position = "blu_top"
             change = -1
 
-        if key == 'a':
+        if key.char == 'a':
+            category = "balls"
             position = "blu_mid"
             change = 1
 
-        if key == 's':
+        if key.char == 's':
+            category = "balls"
             position = "blu_mid"
             change = -1
 
-        if key == 'y':
+        if key.char == 'y':
+            category = "balls"
             position = "blu_low"
             change = 1
 
-        if key == 'x':
+        if key.char == 'x':
+            category = "balls"
             position = "blu_low"
             change = -1
 
 
-        if key == 'o':
+        if key.char == 'e':
+            category = "balls"
             position = "red_top"
             change = 1
         
-        if key == 'p':
+        if key.char == 'r':
+            category = "balls"
             position = "red_top"
             change = -1
 
-        if key == 'k':
+        if key.char == 'd':
+            category = "balls"
             position = "red_mid"
             change = 1
 
-        if key == 'l':
+        if key.char == 'f':
+            category = "balls"
             position = "red_mid"
             change = -1
 
-        if key == 'n':
+        if key.char == 'c':
+            category = "balls"
             position = "red_low"
             change = 1
 
-        if key == 'm':
+        if key.char == 'v':
+            category = "balls"
             position = "red_low"
             change = -1
 
 
-        events.append({"position" : position, "change" : change})
+        if key.char == 't':
+            category = "penalty points"
+            position = "blu"
+            change = 25
 
-    def __init__:
-        keyboard.on_press(press_handler)
-        keyboard.on_release(release_handler)
-        keyboard.wait()
-        
-    def update():
+        if key.char == 'z':
+            category = "penalty points"
+            position = "blu"
+            change = -25
+
+        if key.char == 'g':
+            category = "penalty points"
+            position = "blu"
+            change = 10
+
+        if key.char == 'h':
+            category = "penalty points"
+            position = "blu"
+            change = -10
+
+
+        if key.char == 'u':
+            category = "penalty points"
+            position = "red"
+            change = 25
+
+        if key.char == 'i':
+            category = "penalty points"
+            position = "red"
+            change = -25
+
+        if key.char == 'j':
+            category = "penalty points"
+            position = "red"
+            change = 10
+
+        if key.char == 'k':
+            category = "penalty points"
+            position = "red"
+            change = -10
+
+
+        if position != '':
+            self.events.append({"category": category, "position" : position, "change" : change})
+            #print(f"pressed {key.char}")
+
+    def __init__(self):
+        global listener
+        listener = pkeyboard.Listener(
+                on_press=self.press_handler,
+                on_release=self.release_handler)
+        listener.start()
+
+
+    def update(self):
         return
     
-    def pop_top():
-        return events.pop(0)
+    def pop_top(self):
+        if len(self.events) != 0:
+            return self.events.pop(0)
+        else:
+            return "empty"

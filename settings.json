@@ -13,7 +13,7 @@
     "endgame sound file name" : "endgame.wav",
 
     "sensor scoring enabled" : false,
-    "eps32 attached" : true,
+    "eps32 attached" : false,
 
     "first ball drop" : 2,
     "second ball drop" : 5,

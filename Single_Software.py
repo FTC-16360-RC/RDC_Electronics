@@ -17,7 +17,10 @@ state = {"balls" :
              "blu_low" : 0, 
              "red_top" : 0, 
              "red_mid" : 0, 
-             "red_low" : 0},
+             "red_low" : 0},   
+        "penalty points" : 
+            {"blu" : 0,
+             "red" : 0},
         "time" : 0,             #time in s
         "time_ns" : 0,
         "period" : "holding",   #holding, regulation, endgame, finished
@@ -214,6 +217,9 @@ def calculate_points():
     points["blue"] += int(state["balls"]["blu_mid"]) * 7
     points["blue"] += int(state["balls"]["blu_low"]) * 5
 
+    points["blue"] -= int(state["penalty points"]["blu"])
+    points["orange"] -= int(state["penalty points"]["red"])
+
     return points
 
 
@@ -232,10 +238,19 @@ def start_endgame():
 
 
 def run_manual_scoring(scorer):
-    scorer.update()
-    position = scorer.pop_top()["position"]
-    change = scorer.pop_top()["change"]
-    state["balls"][position] + state["balls"][position] + change
+    global state
+
+    new_entry = scorer.pop_top()
+    if new_entry == "empty":
+        return
+
+    category = new_entry["category"]
+    position = new_entry["position"]
+    change = int(new_entry["change"])
+    state[category][position] = state[category][position] + change
+
+    temp = state[category][position]
+    print(f"now we have {temp} at {category}:{position} with change {change}")
 
 
 def end_match():
@@ -249,6 +264,7 @@ def end_match():
     print("press <ENTER> to confirm points")
     while not keyboard.is_pressed('enter'):
         run_manual_scoring(scorer)
+        window.update()
     
     points = calculate_points()
     log.append({"end points: " : points})
