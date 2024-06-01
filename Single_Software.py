@@ -97,16 +97,20 @@ class Window:
         self.balls_blu_top = tk.Label(self.frame, text=state["balls"]["blu_top"])
         self.balls_blu_mid = tk.Label(self.frame, text=state["balls"]["blu_mid"])
         self.balls_blu_low = tk.Label(self.frame, text=state["balls"]["blu_low"])
+        self.penalties_blu = tk.Label(self.frame, text=state["penalty points"]["blu"])
+        self.penalties_red = tk.Label(self.frame, text=state["penalty points"]["red"])
 
         self.time_label = tk.Label(self.frame, text="time")
         self.state_label = tk.Label(self.frame, text="state")
 
-        self.balls_red_top.grid(row=2, column=0, padx=10, pady=10)
-        self.balls_red_mid.grid(row=3, column=0, padx=10, pady=10)
-        self.balls_red_low.grid(row=4, column=0, padx=10, pady=10)
-        self.balls_blu_top.grid(row=2, column=2, padx=10, pady=10)
-        self.balls_blu_mid.grid(row=3, column=2, padx=10, pady=10)
-        self.balls_blu_low.grid(row=4, column=2, padx=10, pady=10)
+        self.balls_red_top.grid(row=2, column=2, padx=10, pady=10)
+        self.balls_red_mid.grid(row=3, column=2, padx=10, pady=10)
+        self.balls_red_low.grid(row=4, column=2, padx=10, pady=10)
+        self.balls_blu_top.grid(row=2, column=0, padx=10, pady=10)
+        self.balls_blu_mid.grid(row=3, column=0, padx=10, pady=10)
+        self.balls_blu_low.grid(row=4, column=0, padx=10, pady=10)
+        self.penalties_blu.grid(row=6, column=0, padx=10, pady=10)
+        self.penalties_red.grid(row=6, column=2, padx=10, pady=10)
 
         self.time_label.grid(row=0, column=1, padx=10, pady=10)
         self.state_label.grid(row=1, column=0, padx=10, pady=10)
@@ -127,6 +131,8 @@ class Window:
         self.balls_blu_top.config(text=state["balls"]["blu_top"])
         self.balls_blu_mid.config(text=state["balls"]["blu_mid"])
         self.balls_blu_low.config(text=state["balls"]["blu_low"])
+        self.penalties_blu.config(text=state["penalty points"]["blu"])
+        self.penalties_red.config(text=state["penalty points"]["red"])
         self.root.update()
 
     def update_time(self, time_zero_ns):
