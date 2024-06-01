@@ -58,6 +58,10 @@ BALL_DROP_3 = 0
 SENSOR_SCORING = True
 ESP32_ATTACHED = True
 
+updating_state_gui = False
+updating_time_gui = False
+
+
 
 class Window:
     def __init__(self, state):
@@ -106,7 +110,7 @@ class Window:
 
 
         self.root.resizable(True, True)
-        self.update()
+        self.update(state)
     
 
     def change_state(self, new_state):
@@ -151,7 +155,15 @@ class Window:
         self.root.update()
 
             
-    def update(self):
+    def update(self, state):
+        global updating_state_gui
+        global updating_time_gui
+
+        if updating_state_gui:
+            self.update_state(state)
+        if updating_time_gui:
+            self.update_time(time_zero_ns)
+
         self.root.update_idletasks()
         self.root.update()
 
@@ -250,10 +262,14 @@ def run_manual_scoring(scorer):
     state[category][position] = state[category][position] + change
 
     temp = state[category][position]
-    print(f"now we have {temp} at {category}:{position} with change {change}")
+    print(f"now we have {temp} at \"{category}\" : {position} with change {change}")
 
 
 def end_match():
+    
+    global updating_time_gui
+    updating_time_gui = False
+
     window.change_state("end")
     state["period"] = "finished"
 
@@ -264,7 +280,7 @@ def end_match():
     print("press <ENTER> to confirm points")
     while not keyboard.is_pressed('enter'):
         run_manual_scoring(scorer)
-        window.update()
+        window.update(state)
     
     points = calculate_points()
     log.append({"end points: " : points})
@@ -279,14 +295,14 @@ def end_match():
     
     #end loop
     while True:
-        window.update()
+        window.update(state)
 
 
 def wait_for_start(window):
     print("Press <space> to run match")
     print("--waiting--")    
     while not keyboard.is_pressed("space"):
-        window.update()
+        window.update(state)
     window.change_state("Match about to start")
 
 #...
@@ -468,12 +484,15 @@ if __name__ == "__main__":
     time_zero_ns = time.time_ns() + HOLD_DURATION
     last_displayed_timestamp = 0
 
+    #global updating_state_gui
+    #global updating_time_gui
+    updating_time_gui = True
+    updating_state_gui = True
+
     while True:
 
         #update window
-        window.update()
-        window.update_time(time_zero_ns)
-        window.update_state(state)
+        window.update(state)
 
         #upate time
         state["time"] = round((time.time_ns() - time_zero_ns) / 1000000000, 4)
