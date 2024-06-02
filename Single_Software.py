@@ -7,6 +7,7 @@ import json
 import pygame
 import tkinter as tk
 import threading
+import screeninfo
 import Scorer
 
 log = []
@@ -118,6 +119,17 @@ class Window:
 
         self.root.resizable(True, True)
         self.update()
+
+    def fullscreen_on_second_monitor():
+        monitors = screeninfo.get_monitors()
+        if len(monitors) < 2:
+            print("Second monitor not detected")
+            return
+
+        second_monitor = monitors[1]
+        
+        root.geometry(f"{second_monitor.width}x{second_monitor.height}+{second_monitor.x}+{second_monitor.y}")
+        root.attributes('-fullscreen', True)
     
 
     def change_state(self, new_state):
