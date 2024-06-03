@@ -49,7 +49,7 @@ void loop()
   }*/
   if(millis() - t_last_blink >= blink_interval) {
     digitalWrite(LED, !digitalRead(LED)); //Toggle LED
-    
+    Serial.print("!!!!");
     t_last_blink = millis();
   }
   
