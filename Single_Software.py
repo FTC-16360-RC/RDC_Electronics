@@ -71,16 +71,6 @@ class Window:
     def __init__(self, state):
         self.root = tk.Tk() 
 
-        #centering windows chatgpt magic
-        # Set window size and center it on the screen
-        self.window_width = 400
-        self.window_height = 300
-        self.screen_width = self.root.winfo_screenwidth()
-        self.screen_height = self.root.winfo_screenheight()
-        self.x = (self.screen_width - self.window_width) // 2
-        self.y = (self.screen_height - self.window_height) // 2
-        #self.root.geometry(f"{self.window_width}x{self.window_height}+{self.x}+{self.y}")
-
         # Create a frame to contain all labels
         self.frame = tk.Frame(self.root)
         self.frame.grid(row=0, column=0, pady=10, sticky="nsew")
@@ -120,16 +110,26 @@ class Window:
         self.root.resizable(True, True)
         self.update()
 
-    def fullscreen_on_second_monitor():
+        #fullscreen_on_second_monitor
         monitors = screeninfo.get_monitors()
-        if len(monitors) < 2:
-            print("Second monitor not detected")
-            return
-
-        second_monitor = monitors[1]
+        if False:#len(monitors) > 1:
+            print("running on SECOND SCREEN")
+            second_monitor = monitors[1]
         
-        root.geometry(f"{second_monitor.width}x{second_monitor.height}+{second_monitor.x}+{second_monitor.y}")
-        root.attributes('-fullscreen', True)
+            self.root.geometry(f"{second_monitor.width}x{second_monitor.height}+{second_monitor.x}+{second_monitor.y}")
+            self.root.attributes('-fullscreen', True)
+        else:
+            print("runnig on MAIN SCREEN")
+            #centering windows chatgpt magic
+            # Set window size and center it on the screen
+            monitor = monitors[0]
+            self.window_width = 400
+            self.window_height = 300
+            self.x = (monitor.width - self.window_width) // 2
+            self.y = (monitor.height - self.window_height) // 2
+            self.root.geometry(f"{self.window_width}x{self.window_height}+{self.x}+{self.y}")
+
+        
     
 
     def change_state(self, new_state):
