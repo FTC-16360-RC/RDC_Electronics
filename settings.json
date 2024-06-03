@@ -19,5 +19,9 @@
     "second ball drop" : 5,
     "third ball drop" : 7,
 
-    "manual scoring" : true
+    "manual scoring" : true,
+    "activate full screen mode": true,
+    "secondary screen ID" : 1,
+
+    "time display in console" : true
 }
