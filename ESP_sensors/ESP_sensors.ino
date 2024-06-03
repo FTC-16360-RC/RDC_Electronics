@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <VL53L0X.h>
+#include <ESP32Servo.h>
 
 #define xshut_1 19
 #define xshut_2 15
@@ -7,6 +8,8 @@
 
 VL53L0X sensor1;
 VL53L0X sensor2;
+Servo servo1;
+Servo servo2;
 unsigned long t_last_blink = 0;
 unsigned long blink_interval = 1000;
 
@@ -17,6 +20,9 @@ void setup() {
   Wire.begin(); // SDA, SCL
   Serial.begin(9600);
   while (!Serial); // Wait for Serial Monitor to open
+
+  servo1.attach(4);
+  servo2.attach(5);
 
   pinMode(xshut_1, OUTPUT);
   digitalWrite(xshut_1, LOW);
@@ -68,7 +74,8 @@ void loop() {
   
   if(millis() - t_last_blink >= blink_interval) {
     digitalWrite(LED, !digitalRead(LED)); //Toggle LED
-    
+    servo1.write(100*(!digitalRead(LED)));
+    servo2.write(100*(!digitalRead(LED)));
     t_last_blink = millis();
   }
 }
