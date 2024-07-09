@@ -42,3 +42,8 @@ blu_small_penalty g/h
 red_large_penalty z/u
 red_small_penatly h/j
 
+
+ON EVENT DAY:
+  Launch software
+  use WIN+SHIFT+left/right arrow to send to second screen
+  follow instructions

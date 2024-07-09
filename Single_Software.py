@@ -60,6 +60,10 @@ SENSOR_SCORING = True
 ESP32_ATTACHED = True
 
 MANUAL_SCORING = False
+PRESENTATION_MODE = False
+PRESENTATION_SCREEN_ID = 1
+
+CONSOLE_TIME = True
 
 updating_state_gui = False
 updating_time_gui = False
@@ -112,10 +116,11 @@ class Window:
 
         #fullscreen_on_second_monitor
         monitors = screeninfo.get_monitors()
-        if False:#len(monitors) > 1:
-            print("running on SECOND SCREEN")
-            second_monitor = monitors[1]
+        if len(monitors) > 1 and PRESENTATION_MODE:
+            print("running on PRESENTATION SCREEN")
+            second_monitor = monitors[PRESENTATION_SCREEN_ID]
         
+            #self.root.overrideredirect(True)
             self.root.geometry(f"{second_monitor.width}x{second_monitor.height}+{second_monitor.x}+{second_monitor.y}")
             self.root.attributes('-fullscreen', True)
         else:
@@ -145,6 +150,10 @@ class Window:
         self.balls_blu_low.config(text=state["balls"]["blu_low"])
         self.penalties_blu.config(text=state["penalty points"]["blu"])
         self.penalties_red.config(text=state["penalty points"]["red"])
+        self.root.update()
+
+    def override_time(self, t):
+        self.time_label.config(text = t)
         self.root.update()
 
     def update_time(self, time_zero_ns):
@@ -293,6 +302,7 @@ def end_match():
     updating_time_gui = False
 
     window.change_state("end")
+    window.override_time(f"{MATCH_DURATION/1e9} / {MATCH_DURATION/1e9}")
     state["period"] = "finished"
 
     print("END!!!")
@@ -342,7 +352,7 @@ def load_settings():
     global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
     global SENSOR_SCORING, ESP32_ATTACHED
     global BALL_DROP_1, BALL_DROP_2, BALL_DROP_3
-    global MANUAL_SCORING
+    global MANUAL_SCORING, PRESENTATION_MODE, PRESENTATION_SCREEN_ID, CONSOLE_TIME
 
     f = open("settings.json", "r")
     settings = json.load(f)
@@ -368,6 +378,9 @@ def load_settings():
     BALL_DROP_3 = settings["third ball drop"] * 1e9
 
     MANUAL_SCORING = settings["manual scoring"]
+    PRESENTATION_MODE = settings["activate full screen mode"]
+    PRESENTATION_SCREEN_ID = settings["secondary screen ID"]
+    CONSOLE_TIME = settings["time display in console"]
 
     f.close()
 
@@ -545,7 +558,7 @@ if __name__ == "__main__":
             f = handle_serial_data(data, ball_finder_red_low)
 
         #decisec display
-        if time.time_ns() >= last_displayed_timestamp + 250000000:   
+        if time.time_ns() >= last_displayed_timestamp + 250000000 and CONSOLE_TIME:   
             last_displayed_timestamp = time.time_ns()
             t = state["time"]
             t_ns = state["time_ns"]
