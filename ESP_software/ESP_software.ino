@@ -127,13 +127,14 @@ void loop()
     t_last_blink = millis();
   }
 
-  //Handle Servo Input
+  //Handle Sensor Input
   Serial.print("Distance at sensor 29: ");
   Serial.print(String(sensor.readRangeContinuousMillimeters()));
   if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
   Serial.println("");
 
   //Handle Servo nonBlocking
+  /*
   if(millis() - t_pervious_servo_update >= servo_update_interval) {
     t_pervious_servo_update = millis();
 
@@ -196,53 +197,65 @@ void loop()
       current_angle_rl -= step;
       ServoRedLow.write(current_angle_rl);
     }
-  }
+  } */
 
   if(Serial.available() > 0) {
     String msg = Serial.readString();
     
     //Red
     if(msg == "RED_TOP_OPEN") {
-      target_angle_rt = open_angle_rt;
+      //target_angle_rt = open_angle_rt;
+      ServoRedTop.write(open_angle_rt);
     }
     else if(msg == "RED_TOP_CLOSE") {
-      target_angle_rt = closed_angle_rt;
+      //target_angle_rt = closed_angle_rt;$
+      ServoRedTop.write(closed_angle_rt);
     }
 
     else if(msg == "RED_MID_OPEN") {
-      target_angle_rm = open_angle_rm;
+      //target_angle_rm = open_angle_rm;
+      ServoRedMid.write(open_angle_rm);
     }
     else if(msg == "RED_MID_CLOSE") {
-      target_angle_rm = closed_angle_rm;
+      //target_angle_rm = closed_angle_rm;
+      ServoRedMid.write(closed_angle_rm);
     }
 
     else if(msg == "RED_LOW_OPEN") {
-      target_angle_rl = open_angle_rl;
+      //target_angle_rl = open_angle_rl;
+      ServoRedLow.write(open_angle_rl);
     }
     else if(msg == "RED_LOW_CLOSE") {
-      target_angle_rl = closed_angle_rl;
+      //target_angle_rl = closed_angle_rl;
+      ServoRedLow.write(closed_angle_rl);
     }
 
     //Blue
     else if(msg == "BLU_TOP_OPEN") {
-      target_angle_bt = open_angle_bt;
+      //target_angle_bt = open_angle_bt;
+      ServoBluTop.write(open_angle_bt);
     }
     else if(msg == "BLU_TOP_CLOSE") {
-      target_angle_bt = closed_angle_bt;
+      //target_angle_bt = closed_angle_bt;
+      ServoBluTop.write(closed_angle_bt);
     }
 
     else if(msg == "BLU_MID_OPEN") {
-      target_angle_bm = open_angle_bm;
+      //target_angle_bm = open_angle_bm;
+      ServoBluMid.write(open_angle_bm);
     }
     else if(msg == "BLU_MID_CLOSE") {
-      target_angle_bm = closed_angle_bm;
+      //target_angle_bm = closed_angle_bm;
+      ServoBluMid.write(closed_angle_bm);
     }
 
     else if(msg == "BLU_LOW_OPEN") {
-      target_angle_bl = open_angle_bl;
+      //target_angle_bl = open_angle_bl;
+      ServoBluLow.write(open_angle_bl);
     }
     else if(msg == "BLU_LOW_CLOSE") {
-      target_angle_bl = closed_angle_bl;
+      //target_angle_bl = closed_angle_bl;
+      ServoBluLow.write(closed_angle_bl);
     }
   }
 }

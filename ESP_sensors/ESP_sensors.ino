@@ -2,8 +2,8 @@
 #include <VL53L0X.h>
 #include <ESP32Servo.h>
 
-#define xshut_1 19
-#define xshut_2 15
+#define xshut_1 15
+#define xshut_2 19
 #define LED 2
 
 VL53L0X sensor1;
@@ -16,7 +16,8 @@ unsigned long blink_interval = 1000;
 void setup() {
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
-  
+
+  Wire.setClock(20000);
   Wire.begin(); // SDA, SCL
   Serial.begin(9600);
   while (!Serial); // Wait for Serial Monitor to open
