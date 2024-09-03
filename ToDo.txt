@@ -1,1 +1,14 @@
-...
+kaufen:
+  .esp32
+  .jumpers
+  .breadboard
+  .telephone wire
+  .sensors
+  .servos
+
+td:
+  .UI
+  .remote scoring?
+  .software integration
+  .hardware integration
+  .ledsnote

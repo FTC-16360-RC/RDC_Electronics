@@ -242,6 +242,7 @@ def send_serial_command(command):
     global ser
 
     if not ESP32_ATTACHED:
+        print(f"esp not connected. Command: {command}")
         return
     print(f"Writing serial command: {command}")
     log_data(f"serial command {command}")
