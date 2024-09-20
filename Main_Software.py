@@ -244,9 +244,11 @@ def send_serial_command(command):
     if not ESP32_ATTACHED:
         print(f"esp not connected. Command: {command}")
         return
-    print(f"Writing serial command: {command}")
+    print(f"Writing Serial Command: {command}")
+    ser.write((command + '\n').encode('utf-8'))
     log_data(f"serial command {command}")
-    ser.write(command.encode('utf-8'))
+
+    time.sleep(3)
 
 
 #one time match related stuff
@@ -339,9 +341,11 @@ def wait_for_start(window):
 
 #...
 def read_serial(ser):
-
     if ser.in_waiting > 0:
         data = ser.readline().decode('latin1').strip()
+        #if "Distance at sensor" != data[0:18]:
+        #    send_serial_command(data)
+        #    return "XXX"
         return data
     else:
         return "XXXX"
@@ -429,7 +433,9 @@ def handle_scheduled_events():
             continue
         
         if event[0] == "SERIAL_MESSAGE":
-            send_serial_command(event[3])
+            serial_thread = threading.Thread(target=send_serial_command, args=(event[3],))
+            serial_thread.start()
+            #send_serial_command(event[3])
             event[2] = True
             continue
         

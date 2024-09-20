@@ -4,27 +4,32 @@ vl53l0x_ContinuousRanging_Example.c from the VL53L0X API.
 
 The range readings are in units of mm. */
 
-#include <Wire.h>
-#include <VL53L0X.h>
 #include <ESP32Servo.h>
 
 #define LED 2
 #define SDA_PIN 32
 #define SCL_PIN 33
 
-#define PIN_BLU_TOP 14
+#define PIN_BLU_TOP 17
 #define PIN_BLU_MID 31
 #define PIN_BLU_LOW 12
 
 #define PIN_RED_TOP 11
 #define PIN_RED_MID 7
-#define PIN_RED_LOW 4
+#define PIN_RED_LOW 23
 
 
-//Servo Vars
-VL53L0X sensor;
-unsigned long t_last_scan = 0;
-unsigned long scan_interval = 10;
+//sensor Vars
+const int trigPin = 19;
+const int echoPin = 18;
+
+#define SOUND_SPEED 0.034
+#define CM_TO_INCH 0.393701
+
+long duration;
+float distanceMM;
+float distanceInch;
+
 
 
 //Blink Vars
@@ -47,7 +52,7 @@ const int open_angle_bl = 0;
 
 const int open_angle_rt = 0;
 const int open_angle_rm = 0;
-const int open_angle_rl = 0;
+const int open_angle_rl = 18;
 
 const int closed_angle_bt = 90;
 const int closed_angle_bm = 90;
@@ -55,7 +60,7 @@ const int closed_angle_bl = 90;
 
 const int closed_angle_rt = 90;
 const int closed_angle_rm = 90;
-const int closed_angle_rl = 90;
+const int closed_angle_rl = 77;
 
 const int step = 5;
 
@@ -81,9 +86,9 @@ long t_pervious_servo_update = 0;
 
 void setup()
 {
-  //Init i2c
-  Wire.setPins(SDA_PIN, SCL_PIN);
-  Wire.begin();
+  //Init sensor
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT);  // Sets the echoPin as an Input
 
   //Init blinker
   pinMode(LED, OUTPUT);
@@ -102,19 +107,6 @@ void setup()
   ServoRedMid.attach(PIN_RED_MID);
   ServoRedLow.attach(PIN_RED_LOW);
 
-  //Init Sernsors
-  sensor.setTimeout(500);
-  if (!sensor.init())
-  {
-    Serial.println("Failed to detect and initialize sensor!");
-    while (1) {}
-  }
-  // Start continuous back-to-back mode (take readings as
-  // fast as possible).  To use continuous timed mode
-  // instead, provide a desired inter-measurement period in
-  // ms (e.g. sensor.startContinuous(100)).
-  sensor.startContinuous();
-
   digitalWrite(LED, 0);
 }
 
@@ -127,80 +119,9 @@ void loop()
     t_last_blink = millis();
   }
 
-  //Handle Sensor Input
-  Serial.print("Distance at sensor 29: ");
-  Serial.print(String(sensor.readRangeContinuousMillimeters()));
-  if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  Serial.println("");
-
-  //Handle Servo nonBlocking
-  /*
-  if(millis() - t_pervious_servo_update >= servo_update_interval) {
-    t_pervious_servo_update = millis();
-
-    //Blu Top Servo
-    if (current_angle_bt < target_angle_bt) {
-      current_angle_bt += step;
-      ServoBluTop.write(current_angle_bt);
-    }
-    else if (current_angle_bt > target_angle_bt) {
-      current_angle_bt -= step;
-      ServoBluTop.write(current_angle_bt);
-    }
-
-    //Blu Mid Servo
-    if (current_angle_bm < target_angle_bm) {
-      current_angle_bm += step;
-      ServoBluMid.write(current_angle_bm);
-    }
-    else if (current_angle_bm > target_angle_bm) {
-      current_angle_bm -= step;
-      ServoBluMid.write(current_angle_bm);
-    }
-
-    //Blo Low Servo
-    if (current_angle_bl < target_angle_bl) {
-      current_angle_bl += step;
-      ServoBluLow.write(current_angle_bl);
-    }
-    else if (current_angle_bl > target_angle_bl) {
-      current_angle_bl -= step;
-      ServoBluLow.write(current_angle_bl);
-    }
-
-    //Red Top Servo
-    if (current_angle_rt < target_angle_rt) {
-      current_angle_rt += step;
-      ServoRedTop.write(current_angle_rt);
-    }
-    else if (current_angle_rt > target_angle_rt) {
-      current_angle_rt -= step;
-      ServoRedTop.write(current_angle_rt);
-    }
-
-    //Red Mid Servo
-    if (current_angle_rm < target_angle_rm) {
-      current_angle_rm += step;
-      ServoRedMid.write(current_angle_rm);
-    }
-    else if (current_angle_rm > target_angle_rm) {
-      current_angle_rm -= step;
-      ServoRedMid.write(current_angle_rm);
-    }
-
-    //Red Low Servo
-    if (current_angle_rl < target_angle_rl) {
-      current_angle_rl += step;
-      ServoRedLow.write(current_angle_rl);
-    }
-    else if (current_angle_rl > target_angle_rl) {
-      current_angle_rl -= step;
-      ServoRedLow.write(current_angle_rl);
-    }
-  } */
 
   if(Serial.available() > 0) {
-    String msg = Serial.readString();
+    String msg = Serial.readStringUntil('\n');
     
     //Red
     if(msg == "RED_TOP_OPEN") {
@@ -258,4 +179,26 @@ void loop()
       ServoBluLow.write(closed_angle_bl);
     }
   }
+
+  //Handle Sensor Input
+
+    // Clears the trigPin
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    // Sets the trigPin on HIGH state for 10 micro seconds
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    
+    // Reads the echoPin, returns the sound wave travel time in microseconds
+    duration = pulseIn(echoPin, HIGH);
+    
+    // Calculate the distance
+    distanceMM = duration * SOUND_SPEED/2 * 10;
+
+  Serial.print("Distance at sensor 29: ");
+  Serial.println(String(int(trunc(distanceMM))));
+
+  delay(10);
+
 }
