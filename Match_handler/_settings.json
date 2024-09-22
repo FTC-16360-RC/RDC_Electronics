@@ -1,7 +1,7 @@
 {
-    "match duration" : 17,
+    "match duration" : 180,
     "hold duration" : 4,
-    "endgame duration" : 5,
+    "endgame duration" : 30,
     "countdown interval" : 1,
 
     "serial COM port" : "COM6",
@@ -15,9 +15,9 @@
     "sensor scoring enabled" : false,
     "eps32 attached" : false,
 
-    "first ball drop" : 2,
-    "second ball drop" : 5,
-    "third ball drop" : 7,
+    "first ball drop" : 120,
+    "second ball drop" : 90,
+    "third ball drop" : 60,
 
     "manual scoring" : true,
     "activate full screen mode": true,
