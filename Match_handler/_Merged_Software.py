@@ -305,13 +305,13 @@ class Controller(ctk.CTk):
         init_events()
 
         #init ball finders
-        ball_finder_blu_top = BallFinder("29", "blu_top")  #one sensor test
-        ball_finder_blu_mid = BallFinder("91", "blu_mid")
-        ball_finder_blu_low = BallFinder("92", "blu_low")
+        ball_finder_blu_top = BallFinder("25", "blu_top")  #one sensor test
+        ball_finder_blu_mid = BallFinder("33", "blu_mid")
+        ball_finder_blu_low = BallFinder("32", "blu_low")
 
-        ball_finder_red_top = BallFinder("93", "red_top")
-        ball_finder_red_mid = BallFinder("94", "red_mid")
-        ball_finder_red_low = BallFinder("95", "red_low")
+        ball_finder_red_top = BallFinder("22", "red_top")
+        ball_finder_red_mid = BallFinder("14", "red_mid")
+        ball_finder_red_low = BallFinder("26", "red_low")
 
         #init serial
         if(ESP32_ATTACHED):
