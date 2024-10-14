@@ -7,29 +7,52 @@ The range readings are in units of mm. */
 #include <ESP32Servo.h>
 
 #define LED 2
-#define SDA_PIN 32
-#define SCL_PIN 33
 
-#define PIN_BLU_TOP 17
-#define PIN_BLU_MID 31
-#define PIN_BLU_LOW 12
+#define PIN_BLU_TOP 4  
+#define PIN_BLU_MID 16 //RX2
+#define PIN_BLU_LOW 17 //TX2
 
-#define PIN_RED_TOP 11
-#define PIN_RED_MID 7
-#define PIN_RED_LOW 23
+#define PIN_RED_TOP 18
+#define PIN_RED_MID 19
+#define PIN_RED_LOW 21
 
 
-//sensor Vars
-const int trigPin = 19;
-const int echoPin = 18;
+//sensor pins
+const int red_top_trig = 22; //22, 23
+const int red_mid_trig = 14;
+const int red_low_trig = 26;
+
+const int red_top_echo = 23; //22, 23
+const int red_mid_echo = 27;
+const int red_low_echo = 36;
+
+const int blu_top_trig = 25;
+const int blu_mid_trig = 33;
+const int blu_low_trig = 32;
+
+const int blu_top_echo = 39;
+const int blu_mid_echo = 34;
+const int blu_low_echo = 35;
+
 
 #define SOUND_SPEED 0.034
-#define CM_TO_INCH 0.393701
 
-long duration;
-float distanceMM;
-float distanceInch;
+//sensor measurement vars
+long duration_red_top;
+long duration_red_mid;
+long duration_red_low;
 
+long duration_blu_top;
+long duration_blu_mid;
+long duration_blu_low;
+
+double distMM_red_top;
+double distMM_red_mid;
+double distMM_red_low;
+
+double distMM_blu_top;
+double distMM_blu_mid;
+double distMM_blu_low;
 
 
 //Blink Vars
@@ -84,11 +107,35 @@ long servo_update_interval = 3;
 long t_pervious_servo_update = 0;
 
 
+void sendPulse(int trigPin) {
+    // Clears the trigPin
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    // Sets the trigPin on HIGH state for 10 micro seconds
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+}
+
 void setup()
 {
-  //Init sensor
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-  pinMode(echoPin, INPUT);  // Sets the echoPin as an Input
+  //Init sensor pins
+  pinMode(red_top_trig, OUTPUT); // Sets the trigPins as Output
+  pinMode(red_mid_trig, OUTPUT); 
+  pinMode(red_low_trig, OUTPUT); 
+
+  pinMode(blu_top_trig, OUTPUT); 
+  pinMode(blu_mid_trig, OUTPUT); 
+  pinMode(blu_low_trig, OUTPUT); 
+
+  pinMode(red_top_echo, INPUT); // Sets the echoPins as Input
+  pinMode(red_mid_echo, INPUT); 
+  pinMode(red_low_echo, INPUT); 
+
+  pinMode(blu_top_echo, INPUT); 
+  pinMode(blu_mid_echo, INPUT); 
+  pinMode(blu_low_echo, INPUT); 
+
 
   //Init blinker
   pinMode(LED, OUTPUT);
@@ -181,23 +228,53 @@ void loop()
   }
 
   //Handle Sensor Input
+  sendPulse(red_top_echo);
+  duration_red_top = pulseIn(red_top_echo, HIGH);
 
-    // Clears the trigPin
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-    // Sets the trigPin on HIGH state for 10 micro seconds
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-    
-    // Reads the echoPin, returns the sound wave travel time in microseconds
-    duration = pulseIn(echoPin, HIGH);
-    
-    // Calculate the distance
-    distanceMM = duration * SOUND_SPEED/2 * 10;
+  sendPulse(red_mid_echo);
+  duration_red_mid = pulseIn(red_mid_echo, HIGH);
 
-  Serial.print("Distance at sensor 29: ");
-  Serial.println(String(int(trunc(distanceMM))));
+  sendPulse(red_low_echo);
+  duration_red_low = pulseIn(red_low_echo, HIGH);
+
+
+  sendPulse(blu_top_echo);
+  duration_blu_top = pulseIn(blu_top_echo, HIGH);
+
+  sendPulse(blu_mid_echo);
+  duration_blu_mid = pulseIn(blu_mid_echo, HIGH);
+
+  sendPulse(red_low_echo);
+  duration_blu_low = pulseIn(blu_low_echo, HIGH);
+
+
+  distMM_red_top = 10 * duration_red_top * SOUND_SPEED/2;
+  distMM_red_mid = 10 * duration_red_mid * SOUND_SPEED/2;
+  distMM_red_low = 10 * duration_red_low * SOUND_SPEED/2;
+
+  distMM_blu_top = 10 * duration_blu_top * SOUND_SPEED/2;
+  distMM_blu_mid = 10 * duration_blu_mid * SOUND_SPEED/2;
+  distMM_blu_low = 10 * duration_blu_low * SOUND_SPEED/2;
+
+
+  Serial.print("Distance at sensor "); Serial.print(red_top_trig);
+  Serial.println(distMM_red_top);
+
+  Serial.print("Distance at sensor "); Serial.print(red_mid_trig);
+  Serial.println(distMM_red_mid);
+
+  Serial.print("Distance at sensor "); Serial.print(red_low_trig);
+  Serial.println(distMM_red_low);
+
+
+  Serial.print("Distance at sensor "); Serial.print(blu_top_trig);
+  Serial.println(distMM_blu_top);
+
+  Serial.print("Distance at sensor "); Serial.print(blu_mid_trig);
+  Serial.println(distMM_blu_mid);
+
+  Serial.print("Distance at sensor "); Serial.print(blu_low_trig);
+  Serial.println(distMM_blu_low);
 
   delay(10);
 
