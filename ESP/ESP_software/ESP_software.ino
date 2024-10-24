@@ -16,6 +16,9 @@ The range readings are in units of mm. */
 #define PIN_RED_MID 19
 #define PIN_RED_LOW 21
 
+#define NO_SERVOS
+#define DEBUG
+
 
 //sensor pins
 const int red_top_trig = 22; //22, 23
@@ -145,6 +148,7 @@ void setup()
   Serial.begin(9600);
   Serial.println("GOT MY SETUP");
 
+    #ifndef NO_SERVOS
   //Init Servos
   ServoBluTop.attach(PIN_BLU_TOP);
   ServoBluMid.attach(PIN_BLU_MID);
@@ -153,6 +157,7 @@ void setup()
   ServoRedTop.attach(PIN_RED_TOP);
   ServoRedMid.attach(PIN_RED_MID);
   ServoRedLow.attach(PIN_RED_LOW);
+    #endif
 
   digitalWrite(LED, 0);
 }
@@ -166,7 +171,7 @@ void loop()
     t_last_blink = millis();
   }
 
-
+    #ifdef NO_SERVOS
   if(Serial.available() > 0) {
     String msg = Serial.readStringUntil('\n');
     
@@ -226,26 +231,27 @@ void loop()
       ServoBluLow.write(closed_angle_bl);
     }
   }
+    #endif
 
   //Handle Sensor Input
-  sendPulse(red_top_echo);
-  duration_red_top = pulseIn(red_top_echo, HIGH);
+  sendPulse(red_top_trig);
+  duration_red_top = pulseIn(red_top_echo, HIGH, 100000);
 
-  sendPulse(red_mid_echo);
-  duration_red_mid = pulseIn(red_mid_echo, HIGH);
+  sendPulse(red_mid_trig);
+  duration_red_mid = pulseIn(red_mid_echo, HIGH, 100000);
 
-  sendPulse(red_low_echo);
-  duration_red_low = pulseIn(red_low_echo, HIGH);
+  sendPulse(red_low_trig);
+  duration_red_low = pulseIn(red_low_echo, HIGH, 100000);
 
 
-  sendPulse(blu_top_echo);
-  duration_blu_top = pulseIn(blu_top_echo, HIGH);
+  sendPulse(blu_top_trig);
+  duration_blu_top = pulseIn(blu_top_echo, HIGH, 100000);
 
-  sendPulse(blu_mid_echo);
-  duration_blu_mid = pulseIn(blu_mid_echo, HIGH);
+  sendPulse(blu_mid_trig);
+  duration_blu_mid = pulseIn(blu_mid_echo, HIGH, 100000);
 
-  sendPulse(red_low_echo);
-  duration_blu_low = pulseIn(blu_low_echo, HIGH);
+  sendPulse(blu_low_trig);
+  duration_blu_low = pulseIn(blu_low_echo, HIGH, 100000);
 
 
   distMM_red_top = 10 * duration_red_top * SOUND_SPEED/2;
@@ -257,23 +263,23 @@ void loop()
   distMM_blu_low = 10 * duration_blu_low * SOUND_SPEED/2;
 
 
-  Serial.print("Distance at sensor "); Serial.print(red_top_trig);
+  Serial.print("Distance at sensor "); Serial.print(red_top_trig); Serial.print(" ");
   Serial.println(distMM_red_top);
 
-  Serial.print("Distance at sensor "); Serial.print(red_mid_trig);
+  Serial.print("Distance at sensor "); Serial.print(red_mid_trig); Serial.print(" ");
   Serial.println(distMM_red_mid);
 
-  Serial.print("Distance at sensor "); Serial.print(red_low_trig);
+  Serial.print("Distance at sensor "); Serial.print(red_low_trig); Serial.print(" ");
   Serial.println(distMM_red_low);
 
 
-  Serial.print("Distance at sensor "); Serial.print(blu_top_trig);
+  Serial.print("Distance at sensor "); Serial.print(blu_top_trig); Serial.print(" ");
   Serial.println(distMM_blu_top);
 
-  Serial.print("Distance at sensor "); Serial.print(blu_mid_trig);
+  Serial.print("Distance at sensor "); Serial.print(blu_mid_trig); Serial.print(" ");
   Serial.println(distMM_blu_mid);
 
-  Serial.print("Distance at sensor "); Serial.print(blu_low_trig);
+  Serial.print("Distance at sensor "); Serial.print(blu_low_trig); Serial.print(" ");
   Serial.println(distMM_blu_low);
 
   delay(10);
