@@ -4,7 +4,7 @@
     "endgame duration" : 30,
     "countdown interval" : 1,
 
-    "serial COM port" : "COM6",
+    "serial COM port" : "COM7",
     "serial baud rate" : 9600,
 
     "start sound file name" : "start.wav",
@@ -12,8 +12,8 @@
     "countdown sound file name" : "countdown.wav",
     "endgame sound file name" : "endgame.wav",
 
-    "sensor scoring enabled" : false,
-    "eps32 attached" : false,
+    "sensor scoring enabled" : true,
+    "eps32 attached" : true,
 
     "first ball drop" : 120,
     "second ball drop" : 90,

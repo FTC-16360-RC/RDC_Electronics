@@ -134,9 +134,9 @@ def init_events():
         schedule_event(["PLAY_SOUND", 3 * COUNTDOWN_INTERVAL + 1e9, False, SOUND_COUNTDOWN_PATH])
 
         #schedule match events
-        schedule_event(["START_REGULATION", 0, False]) 
-        schedule_event(["START_ENDGAME", MATCH_DURATION - ENDGAME_DURATION, False]) 
-        schedule_event(["END_MATCH", MATCH_DURATION, False]) 
+        schedule_event(["START_REGULATION", MATCH_DURATION + 1e9, False]) 
+        schedule_event(["START_ENDGAME", ENDGAME_DURATION, False]) 
+        schedule_event(["END_MATCH", 0 + 1e9, False]) 
 
         #set Ball Tower Servo serial timings
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "BLU_LOW_OPEN"])
@@ -217,7 +217,32 @@ def load_settings():
     f.close()
 
 
+def increase_score(position):
+    print("pos: ", position)
+    global blue_score, red_score
+    if (position == "blu_top"):
+        score = blue_score.highgoal.get() + 1
+        blue_score.highgoal.set(score)
+    if (position == "blu_mid"):
+        score = blue_score.midgoal.get() + 1
+        blue_score.midgoal.set(score)
+    if (position == "blu_low"):
+        score = blue_score.lowgoal.get() + 1
+        blue_score.lowgoal.set(score)
+    
+    if (position == "red_top"):
+        score = red_score.highgoal.get() + 1
+        red_score.highgoal.set(score)
+    if (position == "red_mid"):
+        score = red_score.midgoal.get() + 1
+        red_score.midgoal.set(score)
+    if (position == "red_low"):
+        score = red_score.lowgoal.get() + 1
+        red_score.lowgoal.set(score)
+
+
 def handle_serial_data(data, ball_finder):
+    #print("handeling data: ", data)
     if not SENSOR_SCORING:
         return
     state_changed = False
@@ -230,11 +255,12 @@ def handle_serial_data(data, ball_finder):
             return
 
         position = ball_finder.position
-        ball_finder.new_datapoint(int(distance))
+        ball_finder.new_datapoint(round(float(distance)))
         if ball_finder.check_for_ball():
             state["balls"][position] = state["balls"][position] + 1
             log_data("ball")
             state_changed = True
+            increase_score(position)
             print("-sensed ball!")
 
         return state_changed
@@ -270,12 +296,14 @@ def handle_scheduled_events():
             continue
         
         if event[0] == "START_REGULATION":
-            #start_regulation()
+            print("were regulationg")
+            state["period"] = "regulation"
             event[2] = True
             continue
         
         if event[0] == "START_ENDGAME":
-            #start_endgame()
+            print("were gaming")
+            state["period"] = "endgame"
             event[2] = True
             continue
 
@@ -294,6 +322,12 @@ def schedule_event(event):
 class Controller(ctk.CTk):
 
     def __init__(self):
+        global ser
+        global ball_finder_blu_top, ball_finder_blu_mid, ball_finder_blu_low
+        global ball_finder_red_top, ball_finder_red_mid, ball_finder_red_low
+
+
+
         super().__init__()
         self.title("RDC Match Display")
         self.geometry("800x600")
@@ -455,6 +489,7 @@ class Controller(ctk.CTk):
         handle_scheduled_events()
         
         #read balls and log stuff
+
         if((state["period"] == "endgame" or state["period"] == "regulation") and SENSOR_SCORING):
             data = read_serial(ser)
 

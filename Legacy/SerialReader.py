@@ -22,4 +22,4 @@ def read_serial(port, baudrate):
             ser.close()
 
 if __name__ == "__main__":
-    read_serial('COM6', 9600)
+    read_serial('COM7', 9600)

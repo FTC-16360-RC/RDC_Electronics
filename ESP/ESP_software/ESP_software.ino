@@ -16,7 +16,7 @@ The range readings are in units of mm. */
 #define PIN_RED_MID 19
 #define PIN_RED_LOW 21
 
-#define NO_SERVOS
+#define _SERVOS //NO_SERVOS
 #define DEBUG
 
 
@@ -171,20 +171,20 @@ void loop()
     t_last_blink = millis();
   }
 
-    #ifdef NO_SERVOS
+    #ifndef NO_SERVOS
   if(Serial.available() > 0) {
     String msg = Serial.readStringUntil('\n');
     
     //Red
     if(msg == "RED_TOP_OPEN") {
       //target_angle_rt = open_angle_rt;
-      ServoRedTop.write(open_angle_rt);
     }
     else if(msg == "RED_TOP_CLOSE") {
       //target_angle_rt = closed_angle_rt;$
       ServoRedTop.write(closed_angle_rt);
     }
 
+      ServoRedTop.write(open_angle_rt);
     else if(msg == "RED_MID_OPEN") {
       //target_angle_rm = open_angle_rm;
       ServoRedMid.write(open_angle_rm);
@@ -263,25 +263,36 @@ void loop()
   distMM_blu_low = 10 * duration_blu_low * SOUND_SPEED/2;
 
 
-  Serial.print("Distance at sensor "); Serial.print(red_top_trig); Serial.print(" ");
-  Serial.println(distMM_red_top);
+  if(distMM_red_top > 5 && distMM_red_top < 800) {
+    Serial.print("Distance at sensor "); Serial.print(red_top_trig); Serial.print(" ");
+    Serial.println(distMM_red_top);
+  }
 
-  Serial.print("Distance at sensor "); Serial.print(red_mid_trig); Serial.print(" ");
-  Serial.println(distMM_red_mid);
+  if(distMM_red_mid > 5 && distMM_red_mid < 800) {
+    Serial.print("Distance at sensor "); Serial.print(red_mid_trig); Serial.print(" ");
+    Serial.println(distMM_red_mid);
+  }
 
-  Serial.print("Distance at sensor "); Serial.print(red_low_trig); Serial.print(" ");
-  Serial.println(distMM_red_low);
+  if(distMM_red_low > 5 && distMM_red_low < 800) {
+    Serial.print("Distance at sensor "); Serial.print(red_low_trig); Serial.print(" ");
+    Serial.println(distMM_red_low);
+  }
 
 
-  Serial.print("Distance at sensor "); Serial.print(blu_top_trig); Serial.print(" ");
-  Serial.println(distMM_blu_top);
+  if(distMM_blu_top > 5 && distMM_blu_top < 800) {
+    Serial.print("Distance at sensor "); Serial.print(blu_top_trig); Serial.print(" ");
+    Serial.println(distMM_blu_top);
+  }
 
-  Serial.print("Distance at sensor "); Serial.print(blu_mid_trig); Serial.print(" ");
-  Serial.println(distMM_blu_mid);
+  if(distMM_blu_mid > 5 && distMM_blu_mid < 800) {
+    Serial.print("Distance at sensor "); Serial.print(blu_mid_trig); Serial.print(" ");
+    Serial.println(distMM_blu_mid);
+  }
 
-  Serial.print("Distance at sensor "); Serial.print(blu_low_trig); Serial.print(" ");
-  Serial.println(distMM_blu_low);
-
+  if(distMM_blu_low > 5 && distMM_blu_low < 800) {
+    Serial.print("Distance at sensor "); Serial.print(blu_low_trig); Serial.print(" ");
+    Serial.println(distMM_blu_low);
+  }
   delay(10);
 
 }
