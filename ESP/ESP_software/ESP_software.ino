@@ -178,13 +178,12 @@ void loop()
     //Red
     if(msg == "RED_TOP_OPEN") {
       //target_angle_rt = open_angle_rt;
+      ServoRedTop.write(open_angle_rt);
     }
     else if(msg == "RED_TOP_CLOSE") {
       //target_angle_rt = closed_angle_rt;$
       ServoRedTop.write(closed_angle_rt);
     }
-
-      ServoRedTop.write(open_angle_rt);
     else if(msg == "RED_MID_OPEN") {
       //target_angle_rm = open_angle_rm;
       ServoRedMid.write(open_angle_rm);
