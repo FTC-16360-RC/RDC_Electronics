@@ -3,15 +3,7 @@ import json
 import keyboard
 
 
-f = open("settings.json", "r")
-settings = json.load(f)
-
-SERIAL_PORT = settings["serial COM port"]
-SERIAL_BAUDRATE = settings["serial baud rate"]
-
-f.close()
-
-ser = serial.Serial(SERIAL_PORT, SERIAL_BAUDRATE)
+ser = serial.Serial('COM7', 9600)
 
 
 def send_serial(message):

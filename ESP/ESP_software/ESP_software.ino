@@ -16,8 +16,9 @@ The range readings are in units of mm. */
 #define PIN_RED_MID 19
 #define PIN_RED_LOW 21
 
-#define _SERVOS //NO_SERVOS
+#define XX_SERVOS //NO_SERVOS
 #define DEBUG
+#define SERIAL_PLOT
 
 
 //sensor pins
@@ -75,7 +76,7 @@ Servo ServoRedLow;
 const int open_angle_bt = 0;
 const int open_angle_bm = 0;
 const int open_angle_bl = 0;
-
+  
 const int open_angle_rt = 0;
 const int open_angle_rm = 0;
 const int open_angle_rl = 18;
@@ -113,7 +114,7 @@ long t_pervious_servo_update = 0;
 void sendPulse(int trigPin) {
     // Clears the trigPin
     digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
+    delayMicroseconds(15);
     // Sets the trigPin on HIGH state for 10 micro seconds
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
@@ -234,23 +235,23 @@ void loop()
 
   //Handle Sensor Input
   sendPulse(red_top_trig);
-  duration_red_top = pulseIn(red_top_echo, HIGH, 100000);
+  duration_red_top = pulseIn(red_top_echo, HIGH, 10000);
 
   sendPulse(red_mid_trig);
-  duration_red_mid = pulseIn(red_mid_echo, HIGH, 100000);
+  duration_red_mid = pulseIn(red_mid_echo, HIGH, 10000);
 
   sendPulse(red_low_trig);
-  duration_red_low = pulseIn(red_low_echo, HIGH, 100000);
+  duration_red_low = pulseIn(red_low_echo, HIGH, 10000);
 
 
   sendPulse(blu_top_trig);
-  duration_blu_top = pulseIn(blu_top_echo, HIGH, 100000);
+  duration_blu_top = pulseIn(blu_top_echo, HIGH, 10000);
 
   sendPulse(blu_mid_trig);
-  duration_blu_mid = pulseIn(blu_mid_echo, HIGH, 100000);
+  duration_blu_mid = pulseIn(blu_mid_echo, HIGH, 10000);
 
   sendPulse(blu_low_trig);
-  duration_blu_low = pulseIn(blu_low_echo, HIGH, 100000);
+  duration_blu_low = pulseIn(blu_low_echo, HIGH, 10000);
 
 
   distMM_red_top = 10 * duration_red_top * SOUND_SPEED/2;
@@ -261,6 +262,8 @@ void loop()
   distMM_blu_mid = 10 * duration_blu_mid * SOUND_SPEED/2;
   distMM_blu_low = 10 * duration_blu_low * SOUND_SPEED/2;
 
+
+#ifndef SERIAL_PLOT
 
   if(distMM_red_top > 5 && distMM_red_top < 800) {
     Serial.print("Distance at sensor "); Serial.print(red_top_trig); Serial.print(" ");
@@ -292,6 +295,37 @@ void loop()
     Serial.print("Distance at sensor "); Serial.print(blu_low_trig); Serial.print(" ");
     Serial.println(distMM_blu_low);
   }
+#endif
+
+#ifdef SERIAL_PLOT
+    Serial.print(red_top_trig); Serial.print(":");
+    Serial.print(distMM_red_top);
+    Serial.print(",");
+
+    Serial.print(red_mid_trig); Serial.print(":");
+    Serial.print(distMM_red_mid);
+    Serial.print(",");
+
+    Serial.print(red_low_trig); Serial.print(":");
+    Serial.print(distMM_red_low);
+    Serial.print(",");
+
+    Serial.print(blu_top_trig); Serial.print(":");
+    Serial.print(distMM_blu_top);
+    Serial.print(",");
+
+    Serial.print(blu_mid_trig); Serial.print(":");
+    Serial.print(distMM_blu_mid);
+    Serial.print(",");
+    
+    Serial.print(blu_low_trig); Serial.print(":");
+    Serial.print(distMM_blu_low);
+    Serial.println("");
+  
+
+#endif
+
+
   delay(10);
 
 }
