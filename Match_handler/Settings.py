@@ -27,6 +27,7 @@ class MatchSettings:
     def init(self):
 
  
+        self.start_time = 0
 
         #all the settings that can be changed for the match, times are at which time this happens
         self.total_matchtime = 180 + 5

@@ -7,13 +7,15 @@
     "serial COM port" : "COM7",
     "serial baud rate" : 9600,
 
-    "start sound file name" : "start.wav",
-    "end sound file name" : "end.wav",
-    "countdown sound file name" : "countdown.wav",
-    "endgame sound file name" : "endgame.wav",
+    "start sound file name" : "start2.wav",
+    "end sound file name" : "end2.wav",
+    "countdown sound file name" : "countdown2.wav",
+    "endgame sound file name" : "endgame2.wav",
+    "balldrop sound file name" : "balldrop.wav",
+    "confirm sound file name" : "confirm.wav",
 
     "sensor scoring enabled" : true,
-    "eps32 attached" : true,
+    "eps32 attached" : false,
 
     "first ball drop" : 120,
     "second ball drop" : 90,

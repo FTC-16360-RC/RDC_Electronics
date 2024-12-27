@@ -75,6 +75,8 @@ SOUND_END_PATH = ""
 SOUND_START_PATH = ""
 SOUND_COUNTDOWN_PATH = ""
 SOUND_ENDGAME_PATH = ""
+SOUND_BALLDROP_PATH = ""
+SOUND_CONFIRM_PATH = ""
 
 BALL_DROP_1 = 0
 BALL_DROP_2 = 0
@@ -140,13 +142,16 @@ def init_events():
 
         #set Ball Tower Servo serial timings
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "BLU_LOW_OPEN"])
-        schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "RED_LOW_OPEN"])
+        schedule_event(["PLAY_SOUND", BALL_DROP_1 + 1.5e9, False, SOUND_BALLDROP_PATH])
+        #schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "RED_LOW_OPEN"])
 
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "BLU_MID_OPEN"])
-        schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "RED_MID_OPEN"])
+        schedule_event(["PLAY_SOUND", BALL_DROP_2 + 1.5e9 , False, SOUND_BALLDROP_PATH])
+        #schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "RED_MID_OPEN"])
 
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "BLU_TOP_OPEN"])
-        schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "RED_TOP_OPEN"])
+        schedule_event(["PLAY_SOUND", BALL_DROP_3 + 1.5e9, False, SOUND_BALLDROP_PATH])
+        #schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "RED_TOP_OPEN"])
 
 #one time match related stuff
 def calculate_points():
@@ -181,7 +186,7 @@ def read_serial(ser):
 def load_settings():
     global SERIAL_PORT, SERIAL_BAUDRATE, MATCH_DURATION, ENDGAME_DURATION
     global COUNTDOWN_INTERVAL, MATCH_DURATION, HOLD_DURATION
-    global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH
+    global SOUND_START_PATH, SOUND_END_PATH, SOUND_COUNTDOWN_PATH, SOUND_ENDGAME_PATH, SOUND_BALLDROP_PATH, SOUND_CONFIRM_PATH
     global SENSOR_SCORING, ESP32_ATTACHED
     global BALL_DROP_1, BALL_DROP_2, BALL_DROP_3
     global MANUAL_SCORING, PRESENTATION_MODE, PRESENTATION_SCREEN_ID, CONSOLE_TIME
@@ -201,6 +206,8 @@ def load_settings():
     SOUND_END_PATH = "./Sounds/" + settings["end sound file name"]
     SOUND_COUNTDOWN_PATH = "./Sounds/" + settings["countdown sound file name"]
     SOUND_ENDGAME_PATH = "./Sounds/" + settings["endgame sound file name"]
+    SOUND_BALLDROP_PATH = "./Sounds/" + settings["balldrop sound file name"]
+    SOUND_CONFIRM_PATH = "./Sounds/" + settings["confirm sound file name"]
 
     SENSOR_SCORING = settings["sensor scoring enabled"]
     ESP32_ATTACHED = settings["eps32 attached"]
@@ -423,12 +430,14 @@ class Controller(ctk.CTk):
         global match_settings
 
         if(self.showed_confirm == False):
+            play_sound(SOUND_CONFIRM_PATH)
             match_settings.show_confirm.set(value = True)
             self.showed_confirm = True
             match_settings.match_stopped.set(value = False)
 
             points = calculate_points()
-            log.append({"end points: " : points})
+            log.append({"blue end points: " : blue_score.total_score})
+            log.append({"red end points: " : red_score.total_score})
 
             print(log)
             f = open("Match log " + str(datetime.datetime.now()).replace(":","_").replace(".","_") + ".json", "x") 
@@ -475,7 +484,7 @@ class Controller(ctk.CTk):
             
         #advance the matchtimer
         if current_time > 0 and match_settings.match_stopped.get() != True:
-            match_settings.current_time.set(current_time -0.01) #SPEED HERE
+            match_settings.current_time.set(match_settings.total_matchtime - (time.time() - match_settings.start_time)) #SPEED HERE
             self.after(10, self.update_matchtimer) #initiate the next instance
         else:
             print("Match Ended------------------------------------")
@@ -512,6 +521,7 @@ class Controller(ctk.CTk):
         blue_score.reset_team_score()
         red_score.reset_team_score()
         match_settings.show_confirm.set(False)
+        match_settings.start_time = time.time()
 
         self.update_matchtimer()
     '''define functions that act on certain timed events, like ball drop and add functions in update_matchtimer function'''

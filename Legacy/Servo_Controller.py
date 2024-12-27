@@ -111,5 +111,5 @@ pressed = False
 
 keyboard.on_press(on_key_press)
 
-keyboard.wait('z')
+keyboard.wait('b')
 print("Quitting...")

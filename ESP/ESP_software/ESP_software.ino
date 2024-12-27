@@ -79,15 +79,15 @@ const int open_angle_bl = 0;
   
 const int open_angle_rt = 0;
 const int open_angle_rm = 0;
-const int open_angle_rl = 18;
+const int open_angle_rl = 0;
 
-const int closed_angle_bt = 90;
-const int closed_angle_bm = 90;
-const int closed_angle_bl = 90;
+const int closed_angle_bt = 53;
+const int closed_angle_bm = 53;
+const int closed_angle_bl = 53;
 
-const int closed_angle_rt = 90;
-const int closed_angle_rm = 90;
-const int closed_angle_rl = 77;
+const int closed_angle_rt = 50;
+const int closed_angle_rm = 50;
+const int closed_angle_rl = 50;
 
 const int step = 5;
 
@@ -147,7 +147,7 @@ void setup()
 
   //Init Serial
   Serial.begin(9600);
-  Serial.println("GOT MY SETUP");
+  //Serial.println("GOT MY SETUP");
 
     #ifndef NO_SERVOS
   //Init Servos

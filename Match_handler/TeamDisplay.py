@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import customtkinter as ctk
+from screeninfo import get_monitors
 
 from  PIL import Image, ImageTk
 import os
@@ -15,14 +16,17 @@ big_penalty = -30
 
 
 match_settings = None
-redcolor = '#ff9028'
-bluecolor = '#08cdf9'
+#redcolor = '#ff9028'
+redcolor = '#08cdf9'
+bluecolor = '#e58124'  #RED AND BLUE SWITCHED!!
 scaling_unit_height = 1
 scaling_unit_width = 1
 scaling_unit = 1
 groundcolor = '#574f4e'
 transparent_grey = '#808080'
+#transparent_grey = '#737373'
 greencolor = '#038024'
+pinkcolor = '#cc376e'
 
 '''#main window for the team display '''
 class Display(ctk.CTkToplevel):
@@ -31,7 +35,12 @@ class Display(ctk.CTkToplevel):
         match_settings = settings
         self.red_score =   red_score
         self.blue_score = blue_score
-        
+
+        #select second monitor
+        monitors = get_monitors()
+        second_screen = monitors[0]  #CHANGE BEFORE NEXT YEAR!!!!!
+    
+
         super().__init__(parent)
         self.title("RDC Match Display")
         self.geometry("800x600")
@@ -47,7 +56,7 @@ class Display(ctk.CTkToplevel):
 
         self.rowconfigure(0, weight = 75)
         self.rowconfigure(1, weight = 25)
-        
+
         #define the frames
         self.blue_console = TeamConsole(self, bluecolor, blue_score)
         self.blue_console.grid(row = 0, column = 0, sticky = 'nsew')
@@ -57,7 +66,7 @@ class Display(ctk.CTkToplevel):
 
         self.red_console = TeamConsole(self, redcolor, red_score)
         self.red_console.grid(row = 0, column = 2, sticky = 'nsew')
-        
+
         self.match_status_console = MatchStatusConsole(self, blue_score, red_score)
         self.match_status_console.grid(row = 1, column = 0, columnspan = 3, sticky = 'nsew')
 
@@ -65,19 +74,19 @@ class Display(ctk.CTkToplevel):
         self.bind("<Escape>", lambda event: self.destroy())
 
         #final frame
-        
+
         self.final_frame = ctk.CTkFrame(self,fg_color = groundcolor)
         self.display_final_score()
-        
+
         match_settings.show_confirm.trace_add("write", self.confirm_score)
 
         #make fullscreen
-        self.attributes("-fullscreen", True)
+        #self.wm_attributes('-fullscreen', True)
 
-        
+
     def confirm_score(self, *args):
-        
-        
+
+
         if(match_settings.show_confirm.get()):
             #display winner
             if(self.blue_score.total_score.get() > self.red_score.total_score.get()):
@@ -96,7 +105,7 @@ class Display(ctk.CTkToplevel):
             self.highgoal.reconfigure(self.blue_score.highgoal.get() *pointshigh , self.red_score.highgoal.get() * pointshigh )
             self.midgoal.reconfigure(self.blue_score.midgoal.get()*pointsmid, self.red_score.midgoal.get()*pointsmid)
             self.lowgoal.reconfigure(self.blue_score.lowgoal.get()*pointslow, self.red_score.lowgoal.get()*pointslow)
-            
+
             red_park = 0
             blue_park = 0
             if(self.blue_score.robot1_park.get() == "high park"):
@@ -118,7 +127,7 @@ class Display(ctk.CTkToplevel):
                 red_park += pointsparkhigh
             elif(self.red_score.robot2_park.get() == "low park"):
                 red_park += pointsparklow
-            
+
             self.parking.reconfigure(blue_park, red_park)
             self.penalty.reconfigure( self.blue_score.penalty.get(), self.red_score.penalty.get())
 
@@ -130,13 +139,13 @@ class Display(ctk.CTkToplevel):
         else:
             self.final_frame.grid_forget()
             self.score_shown = False
-        
+
 
         #self.test_label = ctk.CTkLabel(self, text = "This is a test")
         #self.test_label.pack(master = self.final_frame)
 
     def display_final_score(self):
-        
+
         self.scoring_frame = ctk.CTkFrame(self.final_frame, fg_color = groundcolor, width = self.winfo_width() * 0.7)
         self.scoring_frame.pack(side = 'top', expand = True, fill = tk.BOTH)
         #title with info who won
@@ -170,21 +179,21 @@ class Display(ctk.CTkToplevel):
 
         self.midgoal = self.table_Entry(self.scoring_frame, 0, 0 , "Stufe 2", color = "black", colored_tiles = True)
         self.midgoal.pack(side = 'top', expand = True, fill = tk.BOTH)
-        
+
         self.lowgoal = self.table_Entry(self.scoring_frame, 0, 0 , "Stufe 1", color = "black", colored_tiles = True)
         self.lowgoal.pack(side = 'top', expand = True, fill = tk.BOTH)
-        
+
         self.parking = self.table_Entry(self.scoring_frame, 0, 0 , "Parken", color = "black", colored_tiles = True)
         self.parking.pack(side = 'top', expand = True, fill = tk.BOTH)
 
         self.penalty = self.table_Entry(self.scoring_frame, 0, 0, "Strafen", color = "black", colored_tiles = True)
         self.penalty.pack(side = 'top', expand = True, fill = tk.BOTH)
-        
 
-        self.total = self.table_Entry(self.scoring_frame, 0, 0 , "Gesamt", color = "#d834eb", colored_tiles = False)
+
+        self.total = self.table_Entry(self.scoring_frame, 0, 0 , "Gesamt", color = pinkcolor, colored_tiles = False)
         self.total.pack(side = 'top', expand = True, fill = tk.BOTH)
 
-        
+
     #use for in display, e.g. for settings
     class table_Entry(ctk.CTkFrame):
         def __init__(self, master, score_blue, score_red, category, color, colored_tiles):
@@ -223,8 +232,8 @@ class MatchStatusConsole(ctk.CTkFrame):
         self.columnconfigure(0, weight = 3, uniform = 'c')
         self.columnconfigure(1, weight = 3, uniform = 'c')
         self.columnconfigure(2, weight = 3, uniform = 'c')
-        
-        
+
+
         self.rowconfigure(0, weight = 1, uniform = 'd') #progress bar
         self.rowconfigure(1, weight = 2, uniform = 'd')
         self.rowconfigure(2, weight = 2, uniform = 'd')
@@ -245,7 +254,7 @@ class MatchStatusConsole(ctk.CTkFrame):
 
         self.points_blue_label = ctk.CTkLabel(self.pointsFrame, textvariable = blue_score.total_score, fg_color = bluecolor, font = ('Helvetica', 60 * scaling_unit_height, 'bold'), )
         self.points_red_label = ctk.CTkLabel(self.pointsFrame, textvariable = red_score.total_score, fg_color = redcolor, font = ('Helvetica', 60 * scaling_unit_height, 'bold'), )
-        
+
         self.points_blue_label.grid(column = 0, row = 0, sticky = 'nsew')
         self.points_red_label.grid(column = 1, row = 0, sticky = 'nsew')
 
@@ -255,19 +264,19 @@ class MatchStatusConsole(ctk.CTkFrame):
         #for continuously updating progress bar
         match_settings.current_time.trace_add("write", self.update_progress_bar)
 
-        
+
         #team names
         name_height = scaling_unit_height * 50
         name_width = scaling_unit_width  * 250
         self.team1_1 = ctk.CTkLabel(self, textvariable = match_settings.teamblue_1_name, fg_color = groundcolor, font = ('Helvetica', 15 * scaling_unit, 'bold'), width = name_width, height = name_height,padx = 5*scaling_unit, pady = 5 * scaling_unit, anchor = 'w')
         self.team1_1.grid(row = 1, column = 0, sticky = 'ew')
-        
+
         self.team1_2 = ctk.CTkLabel(self, textvariable = match_settings.teamblue_2_name, fg_color = groundcolor, font = ('Helvetica', 15 * scaling_unit, 'bold'), width = name_width, height = name_height,padx = 5*scaling_unit, pady = 10 * scaling_unit, anchor = 'w')
         self.team1_2.grid(row = 2, column = 0, sticky = 'ew')
 
         self.team2_1 = ctk.CTkLabel(self, textvariable = match_settings.teamred_1_name, fg_color = groundcolor, font = ('Helvetica', 15 * scaling_unit, 'bold'), width = name_width, height = name_height,padx = 5*scaling_unit, pady = 5 * scaling_unit, anchor = 'e')
         self.team2_1.grid(row = 1, column = 2, sticky = 'ew')
-        
+
         self.team2_2 = ctk.CTkLabel(self, textvariable = match_settings.teamred_2_name, fg_color = groundcolor, font = ('Helvetica', 15 * scaling_unit, 'bold'), width = name_width, height = name_height,padx = 5*scaling_unit, pady = 10 * scaling_unit, anchor = 'e')
         self.team2_2.grid(row = 2, column = 2, sticky = 'ew')
 
@@ -294,7 +303,7 @@ class MatchStatusConsole(ctk.CTkFrame):
 
 
 
-        
+
 class MiddleConsole(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master, fg_color = groundcolor)
@@ -316,23 +325,23 @@ class MiddleConsole(ctk.CTkFrame):
         self.refill_timer_frame = ctk.CTkFrame(self, fg_color = groundcolor)
         self.refill_timer_frame.pack(fill = tk.X, expand = False)
 
-        self.refill_timer_label = ctk.CTkLabel(self.refill_timer_frame, text = "Nachschub in: ", fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'))
+        self.refill_timer_label = ctk.CTkLabel(self.refill_timer_frame, text = "Nachschub in: ", fg_color = groundcolor, font = ('Helvetica', 25 * scaling_unit, 'bold'))
         self.refill_timer_label.pack(fill = tk.X, expand = True)
-        
-        self.refill_timer_time = ctk.CTkLabel(self.refill_timer_frame, text = "0 s", fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'))
+
+        self.refill_timer_time = ctk.CTkLabel(self.refill_timer_frame, text = "0 s", fg_color = groundcolor, font = ('Helvetica', 25 * scaling_unit, 'bold'))
         self.refill_timer_time.pack()
 
         self.refill_endgame_label = ctk.CTkLabel(self.refill_timer_frame, text = "Finale Phase!", fg_color = "green", font = ('Helvetica', 20 * scaling_unit, 'bold'))
         #not packed here
 
-        #self.refill_progress = ctk.CTkProgressBar(self, mode = 'determinate')   
+        #self.refill_progress = ctk.CTkProgressBar(self, mode = 'determinate')
         #self.refill_progress.pack(fill = tk.X, expand = False)
 
         #timer display
-        self.timer = ctk.CTkLabel(self, text = "00:00"  , fg_color = 'black', font = ('Helvetica', 60 * scaling_unit, 'bold'))
+        self.timer = ctk.CTkLabel(self, text = "00:00"  , fg_color = 'black', font = ('Helvetica', 80 * scaling_unit, 'bold'))
         self.timer.pack(fill = tk.BOTH, expand = True)
 
-         
+
         #Attach trace to the current_time variable
         match_settings.current_time.trace_add("write", self.update_timer_display)
         match_settings.refill_time.trace_add("write", self.update_refill_timer)
@@ -372,14 +381,14 @@ class MiddleConsole(ctk.CTkFrame):
             self.refill_timer_time.pack()
             self.refill_endgame_label.pack_forget()
             #print("normal mode"+ str(match_settings.event_trigger.get()))
-            
+
 
     def update_refill_timer(self, *args):
 
         refill_time_seconds = int(match_settings.refill_time.get())
         formatted_time = f"{refill_time_seconds} s"
         self.refill_timer_time.configure(text=formatted_time)
-    
+
 
 
     def animate_endgame(self):
@@ -407,18 +416,18 @@ class TeamConsole(ctk.CTkFrame):
         script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
         image_path = os.path.join(script_dir, "./Graphics/GoalZeichnung.png")
         self.resized_image = Image.open(image_path).resize((100, 100))
-        
+
 
         self.image_canvas = tk.Canvas(self, background = groundcolor)
         self.image_canvas.grid(row = 0, column = 1, rowspan = 3, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
 
          # Bind the configure event to resize the image
         self.image_canvas.bind('<Configure>', self.resize_image)
-        
+
         #import labels for scores:
-        self.highgoal_label = ctk.CTkLabel(self, textvariable = team.highgoal, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
-        self.midgoal_label = ctk.CTkLabel(self,textvariable = team.midgoal, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
-        self.lowgoal_label = ctk.CTkLabel(self, textvariable = team.lowgoal, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
+        self.highgoal_label = ctk.CTkLabel(self, textvariable = team.highgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
+        self.midgoal_label = ctk.CTkLabel(self,textvariable = team.midgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
+        self.lowgoal_label = ctk.CTkLabel(self, textvariable = team.lowgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
 
         self.highgoal_label.grid(row = 0, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
         self.midgoal_label.grid(row = 1, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
@@ -432,13 +441,13 @@ class TeamConsole(ctk.CTkFrame):
 
                 self.rowconfigure((0,1,2), weight = 1, uniform = 'f')
                 self.columnconfigure(0, weight = 1, uniform = 'g')
-                self.parkingindicator = ctk.CTkLabel(self, text = " -P-", bg_color= "transparent", fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
+                self.parkingindicator = ctk.CTkLabel(self, text = " - Parkieren -", bg_color= "transparent", fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
                 self.parkingindicator.grid(row = 0, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5* scaling_unit)
 
-                self.parkingindicator_high = ctk.CTkLabel(self, text = "H", bg_color= "transparent", fg_color = transparent_grey, font = ('Helvetica', 20 * scaling_unit), corner_radius = 8)          
+                self.parkingindicator_high = ctk.CTkLabel(self, text = "H", bg_color= "transparent", fg_color = transparent_grey, font = ('Helvetica', 30 * scaling_unit), corner_radius = 8)
                 self.parkingindicator_high.grid(row = 1, column = 0, sticky = 'nsew', padx = 15 * scaling_unit, pady = 7 * scaling_unit)
 
-                self.parkingindicator_low = ctk.CTkLabel(self, text = "L", bg_color= "transparent", fg_color = transparent_grey, font = ('Helvetica', 20 * scaling_unit), corner_radius = 8)
+                self.parkingindicator_low = ctk.CTkLabel(self, text = "T", bg_color= "transparent", fg_color = transparent_grey, font = ('Helvetica', 30 * scaling_unit), corner_radius = 8)
                 self.parkingindicator_low.grid(row = 2, column = 0, sticky = 'nsew', padx = 15 * scaling_unit, pady = 7 * scaling_unit)
 
                 # Trace the variable to call update_parking whenever it changes
@@ -457,19 +466,19 @@ class TeamConsole(ctk.CTkFrame):
                     self.parkingindicator_high.configure(fg_color = greencolor)
                 else:
                     print("Error occured")
-        
+
         bottom_frame = tk.Frame(self,background = self.init_color)
         bottom_frame.grid(row = 3, column = 0, columnspan = 2, sticky = 'nsew')
 
         bottom_frame.grid_columnconfigure((1,2), weight = 1, uniform = 'h')
         bottom_frame.grid_rowconfigure(1, weight = 1, uniform = 'h')
 
-        self.park1 = parking_display(bottom_frame, team.robot1_park).grid(row = 0, column = 1, sticky = 'nsew', padx = 25 * scaling_unit)
-        self.park2 = parking_display(bottom_frame,team.robot2_park).grid(row = 0, column = 2, sticky = 'nsew', padx = 25 * scaling_unit)
+        self.park1 = parking_display(bottom_frame, team.robot1_park).grid(row = 0, column = 1, sticky = 'nsew', padx = 30 * scaling_unit)
+        self.park2 = parking_display(bottom_frame,team.robot2_park).grid(row = 0, column = 2, sticky = 'nsew', padx = 30 * scaling_unit)
 
         #self.penalty_frame = ctk.CTkLabel(bottom_frame, text = "0", fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
-        
-    
+
+
     def resize_image(self, event):
         # Get the new size of the frame
         new_width = int(event.width)
@@ -480,5 +489,4 @@ class TeamConsole(ctk.CTkFrame):
         self.image_tk = ImageTk.PhotoImage(resized_image)
 
         # Update the label's image
-        self.image_canvas.create_image(0, 0, image=self.image_tk, anchor='nw')        
-        
+        self.image_canvas.create_image(0, 0, image=self.image_tk, anchor='nw')
