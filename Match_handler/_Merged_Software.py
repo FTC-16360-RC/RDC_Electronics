@@ -558,8 +558,11 @@ class Scoring(ctk.CTkFrame):
         self.rowconfigure(0, weight = 1, uniform = 'b')
         self.rowconfigure(1, weight = 1, uniform = 'b')
 
-        self.Frame_goals = ctk.CTkFrame(self, fg_color = 'grey')
+        self.Frame_goals = ctk.CTkFrame(self, fg_color = 'gray')
         self.Frame_goals.pack(side= 'left', fill = tk.BOTH, expand = False, padx = 10 * scaling_unit, pady = 10 * scaling_unit)
+
+        self.Frame_goals_team = ctk.CTkFrame(self, fg_color = 'blue')
+        self.Frame_goals_team.pack(side= 'left', fill = tk.BOTH, expand = False, padx = 10 * scaling_unit, pady = 10 * scaling_unit)
 
         self.Frame_other = ctk.CTkFrame(self, fg_color = 'grey')
         self.Frame_other.pack(side = 'left', fill = tk.BOTH, expand = False, padx = 10 * scaling_unit, pady = 10 * scaling_unit)
@@ -613,6 +616,41 @@ class Scoring(ctk.CTkFrame):
 
         self.total_score_label = ctk.CTkLabel(self.Frame_goals, textvariable = team.total_score, fg_color = self.color, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)    
         self.total_score_label.grid(row = 4, column = 1, columnspan = 2, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+
+
+        #hacked in
+        #
+        #pt labels
+        self.highgoal_label_team = ctk.CTkLabel(self.Frame_goals_team, textvariable = team.highgoal_team, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
+        self.midgoal_label_team = ctk.CTkLabel(self.Frame_goals_team, textvariable = team.midgoal_team, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
+        self.lowgoal_label_team = ctk.CTkLabel(self.Frame_goals_team, textvariable = team.lowgoal_team, fg_color = groundcolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15)
+
+        self.highgoal_label_team.grid(row = 1, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.midgoal_label_team.grid(row = 2, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.lowgoal_label_team.grid(row = 3, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+
+        #define plus_buttons
+        self.highgoal_button_p_team = ctk.CTkButton(self.Frame_goals_team, text = "+", fg_color = 'green', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.increment_score(team.highgoal_team))
+        self.midgoal_button_p_team = ctk.CTkButton(self.Frame_goals_team, text = "+", fg_color = 'green', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.increment_score(team.midgoal_team))
+        self.lowgoal_button_p_team = ctk.CTkButton(self.Frame_goals_team, text = "+", fg_color = 'green', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.increment_score(team.lowgoal_team))
+
+        self.highgoal_button_p_team.grid(row = 1, column = 1, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.midgoal_button_p_team.grid(row = 2, column = 1, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.lowgoal_button_p_team.grid(row = 3, column = 1, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+
+        #define_minus_buttons   
+        self.highgoal_button_m_team = ctk.CTkButton(self.Frame_goals_team, text = "-", fg_color = 'red', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.decrement_score(team.highgoal_team))
+        self.midgoal_button_m_team = ctk.CTkButton(self.Frame_goals_team, text = "-", fg_color = 'red', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.decrement_score(team.midgoal_team))
+        self.lowgoal_button_m_team = ctk.CTkButton(self.Frame_goals_team, text = "-", fg_color = 'red', font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 10, command = lambda: team.decrement_score(team.lowgoal_team))
+
+        self.highgoal_button_m_team.grid(row = 1, column = 2, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.midgoal_button_m_team.grid(row = 2, column = 2, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        self.lowgoal_button_m_team.grid(row = 3, column = 2, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+
+        self.team_label = ctk.CTkLabel(self.Frame_goals_team, text = "Alliance Poits", fg_color = 'grey', font = ('Helvetica', 10 * scaling_unit, 'bold'), corner_radius = 15)
+        self.team_label.grid(row = 4, column = 0, columnspan = 1, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
+        #
+        #
 
 
 

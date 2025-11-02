@@ -6,11 +6,18 @@ from screeninfo import get_monitors
 from  PIL import Image, ImageTk
 import os
 
-pointslow = 5
-pointsmid = 7
-pointshigh = 10
+
+pointslow_team = 2
+pointsmid_team = 3
+pointshigh_team = 5
+
+pointslow = 2
+pointsmid = 6
+pointshigh = 12
+
 pointsparkhigh = 15
 pointsparklow = 6
+
 small_penalty = -15
 big_penalty = -30
 
@@ -33,7 +40,7 @@ class Display(ctk.CTkToplevel):
     def __init__(self, parent, settings, blue_score, red_score):
         global match_settings
         match_settings = settings
-        self.red_score =   red_score
+        self.red_score =  red_score
         self.blue_score = blue_score
 
         #select second monitor

@@ -14,7 +14,7 @@
     "balldrop sound file name" : "balldrop.wav",
     "confirm sound file name" : "confirm.wav",
 
-    "sensor scoring enabled" : true,
+    "sensor scoring enabled" : false,
     "eps32 attached" : false,
 
     "first ball drop" : 120,

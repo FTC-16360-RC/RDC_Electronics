@@ -5,10 +5,15 @@ import tkinter as tk
 
        #set this here manually
 
-#set this also in TeamDisplay.py !!
-pointslow = 5
-pointsmid = 7
-pointshigh = 10
+#set this also in TeamDisplay.py (my brother in christ)!!
+pointslow_team = 2
+pointsmid_team = 3
+pointshigh_team = 5
+
+pointslow = 2
+pointsmid = 6
+pointshigh = 12
+
 pointsparkhigh = 15
 pointsparklow = 6
 small_penalty = -15
@@ -61,6 +66,9 @@ class TeamScores:
 
     def __init__(self):
 
+        self.highgoal_team = tk.IntVar(value = 0)
+        self.midgoal_team = tk.IntVar(value = 0)
+        self.lowgoal_team = tk.IntVar(value = 0)
         self.highgoal = tk.IntVar(value = 0)
         self.midgoal = tk.IntVar(value = 0)
         self.lowgoal = tk.IntVar(value = 0)
@@ -74,6 +82,9 @@ class TeamScores:
         self.highgoal.trace_add("write", self.update_total_score)
         self.midgoal.trace_add("write", self.update_total_score)
         self.lowgoal.trace_add("write", self.update_total_score)
+        self.highgoal_team.trace_add("write", self.update_total_score)
+        self.midgoal_team.trace_add("write", self.update_total_score)
+        self.lowgoal_team.trace_add("write", self.update_total_score)
         self.robot1_park.trace_add("write", self.update_total_score)
         self.robot2_park.trace_add("write", self.update_total_score)
         self.penalty.trace_add("write", self.update_total_score)
@@ -86,6 +97,9 @@ class TeamScores:
         self.highgoal.set(0)
         self.midgoal.set(0)
         self.lowgoal.set(0)
+        self.highgoal_team.set(0)
+        self.midgoal_team.set(0)
+        self.lowgoal_team.set(0)
         self.robot1_park.set(value = "not parked")
         self.robot2_park.set(value = "not parked")
         self.penalty.set(0)       
@@ -93,7 +107,10 @@ class TeamScores:
     def update_total_score(self, *args):
         total = (self.highgoal.get()*pointshigh +
                     self.midgoal.get()*pointsmid +
-                    self.lowgoal.get()*pointslow)
+                    self.lowgoal.get()*pointslow +
+                    self.highgoal_team.get()*pointshigh_team +
+                    self.midgoal_team.get()*pointsmid_team +
+                    self.lowgoal_team.get()*pointslow_team)
         
         if(self.robot1_park.get() == "high park"):
             total += pointsparkhigh
