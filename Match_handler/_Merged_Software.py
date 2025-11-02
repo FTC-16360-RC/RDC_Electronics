@@ -142,15 +142,15 @@ def init_events():
 
         #set Ball Tower Servo serial timings
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "BLU_LOW_OPEN"])
-        schedule_event(["PLAY_SOUND", BALL_DROP_1 + 1.5e9, False, SOUND_BALLDROP_PATH])
+        #schedule_event(["PLAY_SOUND", BALL_DROP_1 + 1.5e9, False, SOUND_BALLDROP_PATH])
         #schedule_event(["SERIAL_MESSAGE", BALL_DROP_1, False, "RED_LOW_OPEN"])
 
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "BLU_MID_OPEN"])
-        schedule_event(["PLAY_SOUND", BALL_DROP_2 + 1.5e9 , False, SOUND_BALLDROP_PATH])
+        #schedule_event(["PLAY_SOUND", BALL_DROP_2 + 1.5e9 , False, SOUND_BALLDROP_PATH])
         #schedule_event(["SERIAL_MESSAGE", BALL_DROP_2, False, "RED_MID_OPEN"])
 
         schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "BLU_TOP_OPEN"])
-        schedule_event(["PLAY_SOUND", BALL_DROP_3 + 1.5e9, False, SOUND_BALLDROP_PATH])
+        #schedule_event(["PLAY_SOUND", BALL_DROP_3 + 1.5e9, False, SOUND_BALLDROP_PATH])
         #schedule_event(["SERIAL_MESSAGE", BALL_DROP_3, False, "RED_TOP_OPEN"])
 
 #one time match related stuff
@@ -561,7 +561,7 @@ class Scoring(ctk.CTkFrame):
         self.Frame_goals = ctk.CTkFrame(self, fg_color = 'gray')
         self.Frame_goals.pack(side= 'left', fill = tk.BOTH, expand = False, padx = 10 * scaling_unit, pady = 10 * scaling_unit)
 
-        self.Frame_goals_team = ctk.CTkFrame(self, fg_color = 'blue')
+        self.Frame_goals_team = ctk.CTkFrame(self, fg_color = 'palegreen')
         self.Frame_goals_team.pack(side= 'left', fill = tk.BOTH, expand = False, padx = 10 * scaling_unit, pady = 10 * scaling_unit)
 
         self.Frame_other = ctk.CTkFrame(self, fg_color = 'grey')
@@ -647,7 +647,7 @@ class Scoring(ctk.CTkFrame):
         self.midgoal_button_m_team.grid(row = 2, column = 2, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
         self.lowgoal_button_m_team.grid(row = 3, column = 2, sticky = 'ns', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
 
-        self.team_label = ctk.CTkLabel(self.Frame_goals_team, text = "Alliance Poits", fg_color = 'grey', font = ('Helvetica', 10 * scaling_unit, 'bold'), corner_radius = 15)
+        self.team_label = ctk.CTkLabel(self.Frame_goals_team, text = "Team", fg_color = 'grey', font = ('Helvetica', 10 * scaling_unit, 'bold'), corner_radius = 15)
         self.team_label.grid(row = 4, column = 0, columnspan = 1, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
         #
         #

@@ -330,13 +330,13 @@ class MiddleConsole(ctk.CTkFrame):
 
         #refill_timer frame
         self.refill_timer_frame = ctk.CTkFrame(self, fg_color = groundcolor)
-        self.refill_timer_frame.pack(fill = tk.X, expand = False)
+        # self.refill_timer_frame.pack(fill = tk.X, expand = False)
 
-        self.refill_timer_label = ctk.CTkLabel(self.refill_timer_frame, text = "Nachschub in: ", fg_color = groundcolor, font = ('Helvetica', 25 * scaling_unit, 'bold'))
-        self.refill_timer_label.pack(fill = tk.X, expand = True)
+        self.refill_timer_label = ctk.CTkLabel(self.refill_timer_frame, text = "...", fg_color = groundcolor, font = ('Helvetica', 25 * scaling_unit, 'bold'))
+        # self.refill_timer_label.pack(fill = tk.X, expand = True)
 
         self.refill_timer_time = ctk.CTkLabel(self.refill_timer_frame, text = "0 s", fg_color = groundcolor, font = ('Helvetica', 25 * scaling_unit, 'bold'))
-        self.refill_timer_time.pack()
+        # self.refill_timer_time.pack()
 
         self.refill_endgame_label = ctk.CTkLabel(self.refill_timer_frame, text = "Finale Phase!", fg_color = "green", font = ('Helvetica', 20 * scaling_unit, 'bold'))
         #not packed here
@@ -369,21 +369,25 @@ class MiddleConsole(ctk.CTkFrame):
     def on_change_to_endgame(self, *args):
         if match_settings.event_trigger.get() == "waiting_endgame":
             self.refill_timer_label.configure(text = "Finale Phase in: ")
+            self.refill_timer_label.pack(fill = tk.X, expand = True)
+            self.refill_timer_time.pack()
+            self.refill_timer_frame.pack(fill = tk.X, expand = False)
             #print("waiting endgame")
-        elif match_settings.event_trigger.get() == "endgame":
+        if match_settings.event_trigger.get() == "endgame":
             self.refill_timer_label.configure(text = "Finale Phase! ")
             self.refill_timer_label.pack_forget()
             self.refill_timer_time.pack_forget()
             self.refill_endgame_label.pack(fill = tk.BOTH, expand = True)
             #print("enddgaaammmemee!")
-        elif match_settings.event_trigger.get() == "reset match":
-            self.refill_timer_label.configure(text = "Nachschub in ")
-            self.refill_timer_label.pack()
-            self.refill_timer_time.pack()
-            self.refill_endgame_label.pack_forget()
-            #print("reset match")
+        # elif match_settings.event_trigger.get() == "reset match":
+        #     self.refill_timer_label.configure(text = "Nachschub in ")
+        #     self.refill_timer_label.pack()
+        #     self.refill_timer_time.pack()
+        #     self.refill_endgame_label.pack_forget()
+        #     #print("reset match")
         else:
-            self.refill_timer_label.configure(text = "Nachschub in ")
+            pass
+            self.refill_timer_label.configure(text = "Finale Phase in: ")
             self.refill_timer_label.pack()
             self.refill_timer_time.pack()
             self.refill_endgame_label.pack_forget()
@@ -392,8 +396,8 @@ class MiddleConsole(ctk.CTkFrame):
 
     def update_refill_timer(self, *args):
 
-        refill_time_seconds = int(match_settings.refill_time.get())
-        formatted_time = f"{refill_time_seconds} s"
+        time = int(match_settings.current_time.get() - match_settings.endgame_duration)
+        formatted_time = f"{time} s"
         self.refill_timer_time.configure(text=formatted_time)
 
 
@@ -432,9 +436,9 @@ class TeamConsole(ctk.CTkFrame):
         self.image_canvas.bind('<Configure>', self.resize_image)
 
         #import labels for scores:
-        self.highgoal_label = ctk.CTkLabel(self, textvariable = team.highgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
-        self.midgoal_label = ctk.CTkLabel(self,textvariable = team.midgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
-        self.lowgoal_label = ctk.CTkLabel(self, textvariable = team.lowgoal, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
+        self.highgoal_label = ctk.CTkLabel(self, textvariable = team.highgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
+        self.midgoal_label = ctk.CTkLabel(self, textvariable = team.midgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
+        self.lowgoal_label = ctk.CTkLabel(self, textvariable = team.lowgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
 
         self.highgoal_label.grid(row = 0, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
         self.midgoal_label.grid(row = 1, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)

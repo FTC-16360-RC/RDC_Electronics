@@ -46,7 +46,7 @@ class MatchSettings:
         self.show_confirm = tk.BooleanVar(value = False)
 
         self.current_time = tk.DoubleVar(value = self.total_matchtime)
-        self.refill_time = tk.DoubleVar(value = self.firstball_drop - self.total_matchtime)
+        self.refill_time = tk.DoubleVar(value = self.endgame_duration - self.total_matchtime)
 
         self.teamblue_1_name = tk.StringVar(value ='b1')
         self.teamblue_2_name = tk.StringVar(value = 'b2')
@@ -57,7 +57,7 @@ class MatchSettings:
     def reset_matchstate(self):
 
         self.current_time.set(value = self.total_matchtime)
-        self.refill_time.set(value =  self.total_matchtime  - self.firstball_drop)
+        self.refill_time.set(value =  self.total_matchtime  - self.endgame_duration)
         self.event_trigger.set(value = "reset match")
         self.match_stopped.set(True)
         self.show_confirm.set(False)
@@ -72,6 +72,9 @@ class TeamScores:
         self.highgoal = tk.IntVar(value = 0)
         self.midgoal = tk.IntVar(value = 0)
         self.lowgoal = tk.IntVar(value = 0)
+        self.highgoal_str = tk.StringVar(value = "0/0")
+        self.midgoal_str = tk.StringVar(value = "0/0")
+        self.lowgoal_str = tk.StringVar(value = "0/0")
         self.robot1_park = tk.StringVar(value = "not parked")
         self.robot2_park = tk.StringVar(value = "not parked")
         self.penalty = tk.IntVar(value = 0)
@@ -85,6 +88,9 @@ class TeamScores:
         self.highgoal_team.trace_add("write", self.update_total_score)
         self.midgoal_team.trace_add("write", self.update_total_score)
         self.lowgoal_team.trace_add("write", self.update_total_score)
+        self.highgoal_str.trace_add("write", self.update_total_score)
+        self.midgoal_str.trace_add("write", self.update_total_score)
+        self.lowgoal_str.trace_add("write", self.update_total_score)
         self.robot1_park.trace_add("write", self.update_total_score)
         self.robot2_park.trace_add("write", self.update_total_score)
         self.penalty.trace_add("write", self.update_total_score)
@@ -100,6 +106,9 @@ class TeamScores:
         self.highgoal_team.set(0)
         self.midgoal_team.set(0)
         self.lowgoal_team.set(0)
+        self.highgoal_str.set(value="0/0")
+        self.midgoal_str.set(value="0/0")
+        self.lowgoal_str.set(value="0/0")
         self.robot1_park.set(value = "not parked")
         self.robot2_park.set(value = "not parked")
         self.penalty.set(0)       
@@ -125,6 +134,10 @@ class TeamScores:
         total += self.penalty.get()
 
         self.total_score.set(total)
+
+        self.highgoal_str.set(value=f"{self.highgoal.get()}/{self.highgoal_team.get()}")
+        self.midgoal_str.set(value=f"{self.midgoal.get()}/{self.midgoal_team.get()}")
+        self.lowgoal_str.set(value=f"{self.lowgoal.get()}/{self.lowgoal_team.get()}")
         
 
 
