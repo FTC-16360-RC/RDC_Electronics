@@ -72,9 +72,9 @@ class TeamScores:
         self.highgoal = tk.IntVar(value = 0)
         self.midgoal = tk.IntVar(value = 0)
         self.lowgoal = tk.IntVar(value = 0)
-        self.highgoal_str = tk.StringVar(value = "0/0")
-        self.midgoal_str = tk.StringVar(value = "0/0")
-        self.lowgoal_str = tk.StringVar(value = "0/0")
+        self.highgoal_str = tk.StringVar(value = "0|0")
+        self.midgoal_str = tk.StringVar(value = "0|0")
+        self.lowgoal_str = tk.StringVar(value = "0|0")
         self.robot1_park = tk.StringVar(value = "not parked")
         self.robot2_park = tk.StringVar(value = "not parked")
         self.penalty = tk.IntVar(value = 0)
@@ -106,9 +106,9 @@ class TeamScores:
         self.highgoal_team.set(0)
         self.midgoal_team.set(0)
         self.lowgoal_team.set(0)
-        self.highgoal_str.set(value="0/0")
-        self.midgoal_str.set(value="0/0")
-        self.lowgoal_str.set(value="0/0")
+        self.highgoal_str.set(value="0|0")
+        self.midgoal_str.set(value="0|0")
+        self.lowgoal_str.set(value="0|0")
         self.robot1_park.set(value = "not parked")
         self.robot2_park.set(value = "not parked")
         self.penalty.set(0)       
@@ -135,9 +135,9 @@ class TeamScores:
 
         self.total_score.set(total)
 
-        self.highgoal_str.set(value=f"{self.highgoal.get()}/{self.highgoal_team.get()}")
-        self.midgoal_str.set(value=f"{self.midgoal.get()}/{self.midgoal_team.get()}")
-        self.lowgoal_str.set(value=f"{self.lowgoal.get()}/{self.lowgoal_team.get()}")
+        self.highgoal_str.set(value=f"{self.highgoal.get()}|{self.highgoal_team.get()}")
+        self.midgoal_str.set(value=f"{self.midgoal.get()}|{self.midgoal_team.get()}")
+        self.lowgoal_str.set(value=f"{self.lowgoal.get()}|{self.lowgoal_team.get()}")
         
 
 

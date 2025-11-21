@@ -75,7 +75,7 @@ class Display(ctk.CTkToplevel):
         self.red_console.grid(row = 0, column = 2, sticky = 'nsew')
 
         self.match_status_console = MatchStatusConsole(self, blue_score, red_score)
-        self.match_status_console.grid(row = 1, column = 0, columnspan = 3, sticky = 'nsew')
+        self.match_status_console.grid(row = 1, column = 0, columnspan = 4, sticky = 'nsew')    #TODO
 
         #close the app on escape
         self.bind("<Escape>", lambda event: self.destroy())
@@ -88,7 +88,10 @@ class Display(ctk.CTkToplevel):
         match_settings.show_confirm.trace_add("write", self.confirm_score)
 
         #make fullscreen
-        #self.wm_attributes('-fullscreen', True)
+        #self.update()
+        self.tk.call('tk', 'scaling', 2.0)
+        self.state('zoomed')
+        self.attributes('-fullscreen', True)
 
 
     def confirm_score(self, *args):
@@ -387,19 +390,23 @@ class MiddleConsole(ctk.CTkFrame):
             self.refill_timer_time.pack_forget()
             self.refill_endgame_label.pack(fill = tk.BOTH, expand = True)
             #print("enddgaaammmemee!")
-        # elif match_settings.event_trigger.get() == "reset match":
-        #     self.refill_timer_label.configure(text = "Nachschub in ")
-        #     self.refill_timer_label.pack()
-        #     self.refill_timer_time.pack()
-        #     self.refill_endgame_label.pack_forget()
-        #     #print("reset match")
-        else:
-            pass
-            self.refill_timer_label.configure(text = "Finale Phase in: ")
-            self.refill_timer_label.pack()
-            self.refill_timer_time.pack()
+        elif match_settings.event_trigger.get() == "reset match":
+            self.refill_timer_label.configure(text = "Nachschub in ")
+            self.refill_timer_label.pack_forget()
             self.refill_endgame_label.pack_forget()
-            #print("normal mode"+ str(match_settings.event_trigger.get()))
+            self.refill_timer_time.pack_forget()
+            #print("reset match")
+        else:
+            if (match_settings.current_time.get() < 60):
+                self.refill_timer_label.configure(text = "Finale Phase in: ")
+                self.refill_timer_label.pack()
+                self.refill_timer_time.pack()
+                self.refill_endgame_label.pack_forget()
+                #print("normal mode"+ str(match_settings.event_trigger.get()))
+            else:
+                self.refill_timer_label.pack_forget()
+                self.refill_timer_time.pack_forget()
+                self.refill_timer_frame.pack_forget()
 
 
     def update_refill_timer(self, *args):
@@ -444,10 +451,12 @@ class TeamConsole(ctk.CTkFrame):
         self.image_canvas.bind('<Configure>', self.resize_image)
 
         #import labels for scores:
+        #self.label_label = ctk.CTkLabel(self, textvariable = "local_str", fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
         self.highgoal_label = ctk.CTkLabel(self, textvariable = team.highgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
         self.midgoal_label = ctk.CTkLabel(self, textvariable = team.midgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
         self.lowgoal_label = ctk.CTkLabel(self, textvariable = team.lowgoal_str, fg_color = groundcolor, font = ('Helvetica', 30 * scaling_unit, 'bold'), corner_radius = 15)
 
+        #self.label_label.grid(row = 0, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
         self.highgoal_label.grid(row = 0, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
         self.midgoal_label.grid(row = 1, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
         self.lowgoal_label.grid(row = 2, column = 0, sticky = 'nsew', padx = 5 * scaling_unit, pady = 25 * scaling_unit)
