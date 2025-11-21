@@ -109,9 +109,16 @@ class Display(ctk.CTkToplevel):
                 self.draw_1_label.grid(row = 0, column = 2, sticky = 'nsew', padx = 5 * scaling_unit, pady = 5 * scaling_unit)
                 self.winner_label.grid_forget()
 
-            self.highgoal.reconfigure(self.blue_score.highgoal.get() *pointshigh , self.red_score.highgoal.get() * pointshigh )
-            self.midgoal.reconfigure(self.blue_score.midgoal.get()*pointsmid, self.red_score.midgoal.get()*pointsmid)
-            self.lowgoal.reconfigure(self.blue_score.lowgoal.get()*pointslow, self.red_score.lowgoal.get()*pointslow)
+            #here the final thingy ABCD
+            local_hgstr_blue = f"{self.blue_score.highgoal.get() * pointshigh}/{self.blue_score.highgoal_team.get() * pointshigh_team}"
+            local_hgstr_red = f"{self.red_score.highgoal.get() * pointshigh}/{self.red_score.highgoal_team.get() * pointshigh_team}"
+            local_mgstr_blue = f"{self.blue_score.midgoal.get() * pointsmid}/{self.blue_score.midgoal_team.get() * pointsmid_team}"
+            local_mgstr_red = f"{self.red_score.midgoal.get() * pointsmid}/{self.red_score.midgoal_team.get() * pointsmid_team}"
+            local_lgstr_blue = f"{self.blue_score.lowgoal.get() * pointslow}/{self.blue_score.lowgoal_team.get() * pointslow_team}"
+            local_lgstr_red = f"{self.red_score.lowgoal.get() * pointslow}/{self.red_score.lowgoal_team.get() * pointslow_team}"
+            self.highgoal.reconfigure(local_hgstr_blue , local_hgstr_red)
+            self.midgoal.reconfigure(local_mgstr_blue, local_mgstr_red)
+            self.lowgoal.reconfigure(local_lgstr_blue, local_lgstr_red)
 
             red_park = 0
             blue_park = 0
@@ -205,7 +212,7 @@ class Display(ctk.CTkToplevel):
     class table_Entry(ctk.CTkFrame):
         def __init__(self, master, score_blue, score_red, category, color, colored_tiles):
             super().__init__(master, fg_color = color, corner_radius = 0)
-
+            #not here
             if(colored_tiles):
                 self.blue = ctk.CTkLabel(self, text = score_blue, fg_color = bluecolor, font = ('Helvetica', 20 * scaling_unit, 'bold'), corner_radius = 15, width = 60)
                 self.blue.pack(side = 'left', fill = tk.BOTH, expand = False, padx = 5 * scaling_unit, pady = 5 * scaling_unit)
@@ -229,6 +236,7 @@ class Display(ctk.CTkToplevel):
 
             self.blue.configure(text = new_blue_score)
             self.red.configure(text = new_red_score)
+
 class MatchStatusConsole(ctk.CTkFrame):
     def __init__(self, master, blue_score, red_score):
         super().__init__(master, fg_color = 'grey')
