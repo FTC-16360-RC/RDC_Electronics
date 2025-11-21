@@ -24,8 +24,8 @@ big_penalty = -30
 
 match_settings = None
 #redcolor = '#ff9028'
-redcolor = '#08cdf9'
-bluecolor = '#e58124'  #RED AND BLUE SWITCHED!!
+redcolor = '#e58124'
+bluecolor = '#08cdf9'  #RED AND BLUE SWITCHED!!
 scaling_unit_height = 1
 scaling_unit_width = 1
 scaling_unit = 1

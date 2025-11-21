@@ -11,8 +11,8 @@ import TeamDisplay
 match_settings = None
 blue_score = None
 red_score = None
-redcolor = '#ff9028'
-bluecolor = '#08cdf9'
+redcolor = '#08cdf9'    #RED AND BLUE SWTCHED
+bluecolor = '#ff9028'
 scaling_unit_height = 1
 scaling_unit_width = 1
 scaling_unit = 1
